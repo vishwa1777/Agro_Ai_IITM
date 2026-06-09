@@ -1238,14 +1238,40 @@ const GrowerInsightsPage = () => {
   );
 };
 
+// Custom Switch Component
+const Switch = ({ checked, onChange }) => (
+  <div onClick={onChange} style={{
+    width: 42, height: 22, borderRadius: 11,
+    background: checked ? "#16A34A" : "rgba(255,255,255,0.08)",
+    border: `1px solid ${checked ? "#4ADE80" : "rgba(255,255,255,0.12)"}`,
+    position: "relative", cursor: "pointer", transition: "all 0.2s ease",
+  }}>
+    <div style={{
+      width: 16, height: 16, borderRadius: "50%",
+      background: checked ? "#FFF" : "#64748B",
+      position: "absolute", top: 2, left: checked ? 22 : 2,
+      transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.3)"
+    }} />
+  </div>
+);
+
 // ─── SETTINGS PAGE ────────────────────────────────────────────────────────────
 const SettingsPage = () => {
+  const [activeTab, setActiveTab] = useState("profile");
   const [depot, setDepot] = useState("Jhansi Depot");
   const [stockAlerts, setStockAlerts] = useState(true);
   const [riskAlerts, setRiskAlerts] = useState(true);
   const [weatherAlerts, setWeatherAlerts] = useState(true);
+  
+  const [phone, setPhone] = useState("+91 94123 45678");
+  const [vehicle, setVehicle] = useState("UP-93-AB-4321");
+  const [territory, setTerritory] = useState("Jhansi Cluster-C");
+  
   const [syncing, setSyncing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [lastSync, setLastSync] = useState("10 June 2026, 04:30 AM");
+  const [toast, setToast] = useState("");
 
   const handleSync = () => {
     setSyncing(true);
@@ -1253,77 +1279,410 @@ const SettingsPage = () => {
       setSyncing(false);
       const now = new Date();
       setLastSync(now.toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }));
+      showToast("System synchronization completed!");
     }, 1500);
   };
 
+  const handleSave = () => {
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      showToast("Changes saved successfully!");
+    }, 1000);
+  };
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
+
+  const FormInput = ({ label, value, onChange, readOnly }) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+      <label style={{ fontSize: 11, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</label>
+      <input 
+        type="text" 
+        value={value} 
+        onChange={onChange}
+        readOnly={readOnly} 
+        style={{
+          background: readOnly ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.03)", 
+          border: `1px solid ${readOnly ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.08)"}`,
+          borderRadius: 8, padding: "10px 14px", color: readOnly ? "#475569" : "#CBD5E1",
+          fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif",
+          transition: "border-color 0.2s",
+        }} 
+        onFocus={e => { if(!readOnly) e.target.style.borderColor = "rgba(74,222,128,0.4)"; }}
+        onBlur={e => { if(!readOnly) e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
+      />
+    </div>
+  );
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 800 }}>
-      <Card style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(74,222,128,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: "#4ADE80", fontWeight: 700 }}>
-          AS
+    <div style={{ display: "flex", gap: 32, width: "100%", position: "relative" }}>
+      {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: "fixed", bottom: 24, right: 32, zIndex: 1000,
+          background: "#0F1F14", border: "1px solid #4ADE80", borderRadius: 8,
+          padding: "12px 24px", color: "#4ADE80", fontSize: 13, fontWeight: 700,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.5)", animation: "fadeIn 0.25s ease"
+        }}>
+          ✓ {toast}
         </div>
-        <div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#F8FAFC", fontFamily: "'Space Grotesk',sans-serif" }}>Amit Sharma</div>
-          <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>Field Representative | Jhansi Region</div>
-          <div style={{ fontSize: 11, color: "#475569", marginTop: 4 }}>Employee ID: #AGR-49102  •  amit.sharma@agroai.com</div>
-        </div>
-      </Card>
+      )}
 
-      <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Regional Configuration</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <label style={{ fontSize: 12, color: "#94A3B8" }}>Primary Warehousing Depot</label>
-          <select value={depot} onChange={e => setDepot(e.target.value)} style={{
-            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-            padding: "10px 14px", color: "#CBD5E1", fontSize: 13, width: "100%", outline: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif"
-          }}>
-            <option value="Jhansi Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Jhansi Depot (Primary)</option>
-            <option value="Agra Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Agra Depot</option>
-            <option value="Kanpur Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Kanpur Depot</option>
-          </select>
-        </div>
-      </Card>
+      {/* Left Tabs Sidebar */}
+      <div style={{ width: 200, flexShrink: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+        {[
+          { id: "profile", label: "Representative Profile", icon: <User size={16} /> },
+          { id: "preferences", label: "Field Preferences", icon: <Settings size={16} /> },
+          { id: "sync", label: "Offline Sync", icon: <RefreshCw size={16} /> }
+        ].map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+            display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
+            borderRadius: 10, border: "none", cursor: "pointer", textAlign: "left",
+            background: activeTab === t.id ? "rgba(74,222,128,0.12)" : "transparent",
+            color: activeTab === t.id ? "#4ADE80" : "#64748B",
+            fontWeight: activeTab === t.id ? 700 : 500, fontSize: 13,
+            fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s"
+          }}
+            onMouseEnter={e => { if(activeTab!==t.id) e.currentTarget.style.color = "#CBD5E1"; }}
+            onMouseLeave={e => { if(activeTab!==t.id) e.currentTarget.style.color = "#64748B"; }}
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
 
-      <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Notification Alerts</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {[
-            { label: "Critical Stock Alerts", desc: "Notify immediately when product inventory levels drop below 20%", state: stockAlerts, setState: setStockAlerts },
-            { label: "High Crop Risk Advisories", desc: "Notify when local farm risk indexes increase to High", state: riskAlerts, setState: setRiskAlerts },
-            { label: "Weather Anomalies", desc: "Notify if rain forecast probability is above 60% during field visits", state: weatherAlerts, setState: setWeatherAlerts }
-          ].map(opt => (
-            <div key={opt.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#CBD5E1" }}>{opt.label}</div>
-                <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{opt.desc}</div>
+      {/* Right Content Form */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 20, maxWidth: 640 }}>
+        {activeTab === "profile" && (
+          <>
+            {/* Header info */}
+            <Card style={{ display: "flex", alignItems: "center", gap: 20, padding: "20px" }}>
+              <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(74,222,128,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, color: "#4ADE80", fontWeight: 700, border: "2px solid rgba(74,222,128,0.3)" }}>
+                AS
               </div>
-              <button onClick={() => opt.setState(s => !s)} style={{
-                background: opt.state ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${opt.state ? "#4ADE80" : "rgba(255,255,255,0.1)"}`,
-                color: opt.state ? "#4ADE80" : "#64748B",
-                borderRadius: 20, padding: "6px 14px", fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.15s"
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#F8FAFC", fontFamily: "'Space Grotesk',sans-serif" }}>Amit Sharma</div>
+                <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>Field Representative  •  Jhansi Cluster-C</div>
+                <span style={{ fontSize: 9, background: "rgba(74,222,128,0.12)", color: "#4ADE80", padding: "2px 6px", borderRadius: 4, fontWeight: 700, display: "inline-block", marginTop: 6 }}>ONLINE STATUS: ACTIVE</span>
+              </div>
+            </Card>
+
+            {/* Profile fields */}
+            <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Personal Information</div>
+              
+              <div style={{ display: "flex", gap: 16 }}>
+                <FormInput label="Full Name" value="Amit Sharma" readOnly={true} />
+                <FormInput label="Employee ID" value="#AGR-49102" readOnly={true} />
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                <FormInput label="Email Address" value="amit.sharma@agroai.com" readOnly={true} />
+                <FormInput label="Designation" value="Senior Field Executive" readOnly={true} />
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                <FormInput label="Contact Phone" value={phone} onChange={e => setPhone(e.target.value)} />
+                <FormInput label="Assigned Cluster" value={territory} onChange={e => setTerritory(e.target.value)} />
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                <FormInput label="Transit Vehicle No." value={vehicle} onChange={e => setVehicle(e.target.value)} />
+                <div style={{ flex: 1 }} /> {/* Spacing */}
+              </div>
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                <button onClick={handleSave} disabled={saving} style={{
+                  background: "#16A34A", color: "#FFF", border: "none", borderRadius: 8,
+                  padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                  transition: "background 0.2s", display: "flex", alignItems: "center", gap: 8
+                }}>
+                  {saving ? "Saving Changes..." : "Save Changes"}
+                </button>
+              </div>
+            </Card>
+          </>
+        )}
+
+        {activeTab === "preferences" && (
+          <>
+            {/* Depot Selector */}
+            <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Primary Depot Selection</div>
+              <div style={{ fontSize: 11, color: "#64748B", marginTop: -10 }}>Select your warehouse depot cluster to sync stock levels.</div>
+              
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                {[
+                  { id: "Jhansi Depot", name: "Jhansi Depot", region: "UP Region-A", code: "JHS-01" },
+                  { id: "Agra Depot", name: "Agra Depot", region: "UP Region-B", code: "AGR-02" },
+                  { id: "Kanpur Depot", name: "Kanpur Depot", region: "UP Region-C", code: "KNP-03" }
+                ].map(d => {
+                  const isSelected = depot === d.id;
+                  return (
+                    <div key={d.id} onClick={() => setDepot(d.id)} style={{
+                      background: isSelected ? "rgba(74,222,128,0.06)" : "rgba(255,255,255,0.02)",
+                      border: `1px solid ${isSelected ? "#4ADE80" : "rgba(255,255,255,0.07)"}`,
+                      borderRadius: 12, padding: "14px", cursor: "pointer", transition: "all 0.2s ease"
+                    }}
+                      onMouseEnter={e => { if(!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
+                      onMouseLeave={e => { if(!isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? "#4ADE80" : "#F8FAFC" }}>{d.name}</span>
+                        {isSelected && <span style={{ fontSize: 9, background: "rgba(74,222,128,0.15)", color: "#4ADE80", padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>ACTIVE</span>}
+                      </div>
+                      <div style={{ fontSize: 11, color: "#64748B" }}>{d.region}</div>
+                      <div style={{ fontSize: 10, color: "#475569", marginTop: 6 }}>Code: {d.code}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+
+            {/* Notification Preferences */}
+            <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Notification & Field Alerts</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {[
+                  { label: "Critical Stock Alerts", desc: "Notify immediately when product inventory levels drop below 20%", state: stockAlerts, setState: setStockAlerts },
+                  { label: "High Crop Risk Advisories", desc: "Notify when local farm risk indexes increase to High", state: riskAlerts, setState: setRiskAlerts },
+                  { label: "Weather Anomalies", desc: "Notify if rain forecast probability is above 60% during field visits", state: weatherAlerts, setState: setWeatherAlerts }
+                ].map(opt => (
+                  <div key={opt.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#CBD5E1" }}>{opt.label}</div>
+                      <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{opt.desc}</div>
+                    </div>
+                    <Switch checked={opt.state} onChange={() => opt.setState(s => !s)} />
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                <button onClick={handleSave} disabled={saving} style={{
+                  background: "#16A34A", color: "#FFF", border: "none", borderRadius: 8,
+                  padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                  transition: "background 0.2s"
+                }}>
+                  {saving ? "Saving Preferences..." : "Save Preferences"}
+                </button>
+              </div>
+            </Card>
+          </>
+        )}
+
+        {activeTab === "sync" && (
+          <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Offline Database Synchronization</div>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.03)", paddingBottom: 10 }}>
+                <span style={{ fontSize: 13, color: "#94A3B8" }}>Database Connection</span>
+                <span style={{ fontSize: 13, color: "#4ADE80", fontWeight: 700 }}>ONLINE (FAST 4G)</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.03)", paddingBottom: 10 }}>
+                <span style={{ fontSize: 13, color: "#94A3B8" }}>Local Cache Size</span>
+                <span style={{ fontSize: 13, color: "#CBD5E1" }}>4.82 MB</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.03)", paddingBottom: 10 }}>
+                <span style={{ fontSize: 13, color: "#94A3B8" }}>Pending Offline Uploads</span>
+                <span style={{ fontSize: 13, color: "#CBD5E1" }}>0 records</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 10 }}>
+                <span style={{ fontSize: 13, color: "#94A3B8" }}>Last Synchronization</span>
+                <span style={{ fontSize: 13, color: "#CBD5E1" }}>{lastSync}</span>
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(74,222,128,0.05)", border: "1px solid rgba(74,222,128,0.1)", borderRadius: 8, padding: "12px 14px", marginTop: 10 }}>
+              <div style={{ fontSize: 12, color: "#4ADE80", fontWeight: 700 }}>💡 Synchronization Tip</div>
+              <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, lineHeight: 1.5 }}>
+                Syncing updates the offline distributor inventory maps, grower riskanalyses, and weather forecasts. Ensure a stable internet connection before running a full sync.
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 16, display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={handleSync} disabled={syncing} style={{
+                background: syncing ? "rgba(255,255,255,0.05)" : "rgba(74,222,128,0.12)",
+                color: syncing ? "#64748B" : "#4ADE80",
+                border: `1px solid ${syncing ? "rgba(255,255,255,0.1)" : "rgba(74,222,128,0.25)"}`,
+                borderRadius: 8, padding: "12px 24px", fontSize: 13, fontWeight: 700, cursor: syncing ? "default" : "pointer", transition: "all 0.15s"
               }}>
-                {opt.state ? "Enabled" : "Disabled"}
+                {syncing ? "Synchronizing database..." : "Force Full Synchronization"}
               </button>
             </div>
-          ))}
-        </div>
-      </Card>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+};
 
-      <Card style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Offline Data Synchronization</div>
-          <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Last synced: {lastSync}</div>
-        </div>
-        <button onClick={handleSync} disabled={syncing} style={{
-          background: syncing ? "rgba(255,255,255,0.05)" : "rgba(74,222,128,0.12)",
-          color: syncing ? "#64748B" : "#4ADE80",
-          border: `1px solid ${syncing ? "rgba(255,255,255,0.1)" : "rgba(74,222,128,0.25)"}`,
-          borderRadius: 8, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: syncing ? "default" : "pointer", transition: "all 0.15s"
-        }}>
-          {syncing ? "Syncing..." : "Sync Now"}
-        </button>
-      </Card>
+const monthlySalesPerformance = [
+  { month: "Jan", actual: 80000, target: 75000 },
+  { month: "Feb", actual: 120000, target: 100000 },
+  { month: "Mar", actual: 150000, target: 140000 },
+  { month: "Apr", actual: 180000, target: 200000 },
+  { month: "May", actual: 300000, target: 250000 },
+  { month: "Jun", actual: 250000, target: 240000 },
+];
+
+const productSalesDistribution = [
+  { name: "Actara 25 WG", value: 45000, color: "#4ADE80" },
+  { name: "Custodia", value: 30000, color: "#A855F7" },
+  { name: "Ridomil Gold", value: 25000, color: "#EF4444" },
+  { name: "Tilt 250 EC", value: 15000, color: "#EAB308" },
+  { name: "Movondo", value: 10000, color: "#64748B" }
+];
+
+const visitTrendData = [
+  { week: "W1", visits: 10, target: 12 },
+  { week: "W2", visits: 14, target: 12 },
+  { week: "W3", visits: 18, target: 12 },
+  { week: "W4", visits: 15, target: 12 }
+];
+
+// ─── ANALYTICS PAGE ───────────────────────────────────────────────────────────
+const AnalyticsPage = () => {
+  const [region, setRegion] = useState("All Regions");
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Header filter */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+        <FilterDropdown label={region} options={["All Regions", "Jhansi Territory", "Patna Territory"]} value={region} onChange={setRegion} />
+      </div>
+
+      {/* Metric Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        <KpiCard icon={<IndianRupee size={22}/>} iconBg="rgba(74,222,128,0.2)" label="Total Sales Value" value="₹12.50L" valueColor="#4ADE80" sub="vs Target: ₹11.00L" />
+        <KpiCard icon={<TrendingUp size={22}/>} iconBg="rgba(56,189,248,0.2)" label="Target Achievement" value="113.6%" valueColor="#38BDF8" sub="High performance index" />
+        <KpiCard icon={<Users size={22}/>} iconBg="rgba(168,85,247,0.2)" label="Total Field Visits" value="62" valueColor="#A855F7" sub="This calendar month" />
+        <KpiCard icon={<CheckCircle size={22}/>} iconBg="rgba(234,179,8,0.2)" label="CSAT Rating" value="4.8 / 5.0" valueColor="#EAB308" sub="Grower satisfaction score" />
+      </div>
+
+      {/* Main Charts Row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.7fr", gap: 16 }}>
+        {/* Sales Performance Area Chart */}
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Revenue Generation vs Targets</div>
+            <div style={{ display: "flex", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#94A3B8" }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: "#4ADE80" }} /> Actual
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#94A3B8" }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: "rgba(255,255,255,0.2)" }} /> Target
+              </div>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={monthlySalesPerformance} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#4ADE80" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#4ADE80" stopOpacity={0.01}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: "#64748B", fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tickFormatter={v => `₹${v/1000}k`} tick={{ fill: "#64748B", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip formatter={v => `₹${v.toLocaleString()}`} contentStyle={{ background: "#0F1F14", border: "1px solid rgba(74,222,128,0.3)", borderRadius: 8, fontSize: 12 }} />
+              <Area type="monotone" dataKey="actual" stroke="#4ADE80" strokeWidth={2} fillOpacity={1} fill="url(#colorActual)" />
+              <Area type="monotone" dataKey="target" stroke="rgba(255,255,255,0.3)" strokeDasharray="4 4" fill="none" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Product Sales Donut Chart */}
+        <Card style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Product Sales Share</div>
+          <div style={{ display: "flex", justifyContent: "center", position: "relative", height: 140 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={productSalesDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={60}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {productSalesDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={v => `₹${v.toLocaleString()}`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: "#64748B" }}>Total Share</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>100%</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
+            {productSalesDistribution.map(item => (
+              <div key={item.name} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: item.color }} />
+                <span style={{ color: "#CBD5E1", flex: 1 }}>{item.name}</span>
+                <span style={{ color: "#94A3B8", fontWeight: 700 }}>₹{(item.value/1000)}k</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Bottom Row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+        {/* Weekly Visits Comparison */}
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Field Visit Performance</div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "#94A3B8" }}><div style={{ width: 8, height: 8, borderRadius: 2, background: "#38BDF8" }} /> Actual</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "#94A3B8" }}><div style={{ width: 8, height: 8, borderRadius: 2, background: "rgba(255,255,255,0.15)" }} /> Target</div>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={visitTrendData} barGap={4} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="week" tick={{ fill: "#64748B", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fill: "#64748B", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={{ background: "#0F1F14", border: "1px solid rgba(56,189,248,0.3)", borderRadius: 8, fontSize: 11 }} />
+              <Bar dataKey="visits" fill="#38BDF8" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="target" fill="rgba(255,255,255,0.15)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Actionable Insights Box */}
+        <Card style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC", display: "flex", alignItems: "center", gap: 6 }}>
+            <span>⚡</span> Actionable Regional Insights
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {[
+              { text: "Actara 25 WG sales rose 45% in Patna district due to early season whitefly risk alerts.", severity: "Success" },
+              { text: "Visits to Kisan Seed Store generated 35% higher order value than regional average.", severity: "Info" },
+              { text: "Outstanding balance in Jhansi is down 12% following coordinated payment follow-up alerts.", severity: "Success" },
+              { text: "High crop risk alerts in wheat clusters triggered 18 additional advisory sessions this week.", severity: "Info" }
+            ].map((ins, idx) => (
+              <div key={idx} style={{
+                display: "flex", gap: 10, background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8, padding: "10px 14px", alignItems: "center"
+              }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4,
+                  background: ins.severity === "Success" ? "rgba(74,222,128,0.1)" : "rgba(56,189,248,0.1)",
+                  color: ins.severity === "Success" ? "#4ADE80" : "#38BDF8"
+                }}>{ins.severity}</span>
+                <span style={{ fontSize: 12, color: "#CBD5E1", lineHeight: 1.4 }}>{ins.text}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
@@ -1368,7 +1727,7 @@ export default function App() {
     riskAnalyzer: <RiskAnalyzerPage />,
     retailerInsights: <RetailerInsightsPage />,
     growerInsights: <GrowerInsightsPage />,
-    analytics: <PlaceholderPage title="Analytics" />,
+    analytics: <AnalyticsPage />,
     settings: <SettingsPage />,
     visit:    <VisitPage />,
     revenue:  <RevenuePage />,
