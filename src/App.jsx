@@ -34,6 +34,22 @@ const todayTasks = [
   { id:5, type:"Revenue", text:"Follow up on ₹18K pending order",         time:"4:30 PM"  },
 ];
 
+const retailerData = [
+  { id: 1, name: "Ganga Agri Kendra", owner: "Rajesh Gupta", phone: "+91 98765 43210", location: "Patna Tahsil, Patna", status: "Active", stockLevel: "Low Stock", outstanding: 12500, totalSales: 185000, lastVisit: "3 days ago" },
+  { id: 2, name: "Kisan Seed Store", owner: "Suresh Patel", phone: "+91 98765 43211", location: "Jhansi Bypass, Jhansi", status: "Low Stock", stockLevel: "Critical", outstanding: 8000, totalSales: 152000, lastVisit: "7 days ago" },
+  { id: 3, name: "Mahavir Fertilizers", owner: "Mahendra Singh", phone: "+91 98765 43212", location: "Mauranipur, Jhansi", status: "Active", stockLevel: "Healthy", outstanding: 0, totalSales: 98000, lastVisit: "12 days ago" },
+  { id: 4, name: "Ram Krishi Bhandar", owner: "Ram Kumar", phone: "+91 98765 43213", location: "Babina, Jhansi", status: "Inactive", stockLevel: "Healthy", outstanding: 4500, totalSales: 75000, lastVisit: "28 days ago" },
+  { id: 5, name: "Balaji Seeds & Chemicals", owner: "Vijay Sharma", phone: "+91 98765 43214", location: "Gursarai, Jhansi", status: "Active", stockLevel: "Low Stock", outstanding: 15000, totalSales: 210000, lastVisit: "Yesterday" }
+];
+
+const growerData = [
+  { id: 1, name: "Ramesh Kumar", land: "12 Acres", crop: "Wheat", stage: "Tillering", risk: "High Risk", phone: "+91 94123 45678", location: "Karguwan Village", lastContact: "Today", advisory: "Apply Ridomil Gold for blight risk" },
+  { id: 2, name: "Suresh Patel", land: "8 Acres", crop: "Cotton", stage: "Flowering", risk: "Medium Risk", phone: "+91 94123 45679", location: "Sajnam Village", lastContact: "3 days ago", advisory: "Monitor whitefly population closely" },
+  { id: 3, name: "Mahesh Singh", land: "15 Acres", crop: "Rice", stage: "Nursery", risk: "Low Risk", phone: "+91 94123 45680", location: "Simra Village", lastContact: "5 days ago", advisory: "Irrigate crop within 2 days" },
+  { id: 4, name: "Dinesh Yadav", land: "5 Acres", crop: "Maize", stage: "Vegetative", risk: "Low Risk", phone: "+91 94123 45681", location: "Bijoli Village", lastContact: "10 days ago", advisory: "Weeding required in field" },
+  { id: 5, name: "Harish Chandra", land: "20 Acres", crop: "Wheat", stage: "Harvested", risk: "Low Risk", phone: "+91 94123 45682", location: "Pura Village", lastContact: "Yesterday", advisory: "Soil preparation advice for Kharif" }
+];
+
 const LEVEL_COLOR = { Critical:"#EF4444", Low:"#F97316", Medium:"#EAB308", Healthy:"#4ADE80", High:"#EF4444" };
 const LEVEL_BG    = { Critical:"rgba(239,68,68,0.12)", Low:"rgba(249,115,22,0.12)", Medium:"rgba(234,179,8,0.12)", Healthy:"rgba(74,222,128,0.12)" };
 const CROP_COLOR  = l => ({ High:"#EF4444", Medium:"#F97316", Low:"#84CC16" }[l]);
@@ -41,18 +57,18 @@ const TYPE_COLOR  = { Visit:"#4ADE80", Stock:"#A855F7", Revenue:"#EAB308" };
 
 const NAV = [
   { key:"dashboard", icon:<Home size={18}/>, label:"Dashboard" },
-  { key:"visitPlanner", icon:<Calendar size={18}/>, label:"Visit Planner" },
-  { key:"aiRecommendations", icon:<Lightbulb size={18}/>, label:"AI Recommendations" },
-  { key:"riskAnalyzer", icon:<Search size={18}/>, label:"Risk Analyzer" },
-  { key:"retailerInsights", icon:<Store size={18}/>, label:"Retailer Insights" },
-  { key:"growerInsights", icon:<Users size={18}/>, label:"Grower Insights" },
-  { key:"analytics", icon:<BarChart2 size={18}/>, label:"Analytics" },
-  { key:"settings", icon:<Settings size={18}/>, label:"Settings" },
-  { key:"visit",    icon:<Users size={18}/>, label:"Visit Performance" },
-  { key:"revenue",  icon:<IndianRupee size={18}/>,  label:"Monthly Revenue" },
-  { key:"stock",    icon:<Bell size={18}/>, label:"Stock Alerts" },
-  { key:"crop",     icon:<Wheat size={18}/>, label:"Crop Risk" },
-  { key:"weather",  icon:<CloudRain size={18}/>, label:"Weather Alert" },
+  { key:"visitPlanner", icon:<Calendar size={18}/>, label:"Visit Planner", sub:"AI-powered visit planning to maximize your impact" },
+  { key:"aiRecommendations", icon:<Lightbulb size={18}/>, label:"AI Recommendations", sub:"Smart recommendations to help you take the right action." },
+  { key:"riskAnalyzer", icon:<Search size={18}/>, label:"Risk Analyzer", sub:"Monitor and mitigate agricultural risks" },
+  { key:"retailerInsights", icon:<Store size={18}/>, label:"Retailer Insights", sub:"Detailed performance and insights of retail locations" },
+  { key:"growerInsights", icon:<Users size={18}/>, label:"Grower Insights", sub:"Track grower engagement and feedback" },
+  { key:"analytics", icon:<BarChart2 size={18}/>, label:"Analytics", sub:"Visualized analytics and data trends" },
+  { key:"settings", icon:<Settings size={18}/>, label:"Settings", sub:"Configure your app and region preferences" },
+  { key:"visit",    icon:<Clipboard size={18}/>, label:"Visit Performance", sub:"Track actual field visits against the target per day", hideInSidebar: true },
+  { key:"revenue",  icon:<IndianRupee size={18}/>,  label:"Monthly Revenue", sub:"Track revenue generated across months", hideInSidebar: true },
+  { key:"stock",    icon:<Bell size={18}/>, label:"Stock Alerts", sub:"Real-time stock status across top products", hideInSidebar: true },
+  { key:"crop",     icon:<Wheat size={18}/>, label:"Crop Risk", sub:"Risk Percentage by Crop", hideInSidebar: true },
+  { key:"weather",  icon:<CloudRain size={18}/>, label:"Weather Alert", sub:"Stay prepared for changing weather", hideInSidebar: true },
 ];
 
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
@@ -115,19 +131,15 @@ const FilterDropdown = ({ label, options, value, onChange }) => {
   );
 };
 
-// Page Header with filter
-const PageHeader = ({ icon, title, sub, filterOptions, filter, onFilter }) => (
-  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:22 }}>
-    <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-      <div style={{ width:46, height:46, borderRadius:12, background:"rgba(74,222,128,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{icon}</div>
-      <div>
-        <div style={{ fontSize:18, fontWeight:800, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>{title}</div>
-        <div style={{ fontSize:12, color:"#64748B", marginTop:2 }}>{sub}</div>
-      </div>
+// Page Header with filter - only renders the filter dropdown now that title/sub/icon are in the TopBar
+const PageHeader = ({ filterOptions, filter, onFilter }) => {
+  if (!filterOptions) return null;
+  return (
+    <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:16 }}>
+      <FilterDropdown label={filter} options={filterOptions} value={filter} onChange={onFilter} />
     </div>
-    {filterOptions && <FilterDropdown label={filter} options={filterOptions} value={filter} onChange={onFilter} />}
-  </div>
-);
+  );
+};
 
 const KpiCard = ({ icon, iconBg, label, value, valueColor, sub, onClick }) => (
   <div onClick={onClick} style={{
@@ -164,7 +176,7 @@ const Sidebar = ({ active, onNav }) => (
       </div>
     </div>
     <div style={{ fontSize:9, color:"#334155", fontWeight:700, letterSpacing:2, padding:"0 10px 8px", textTransform:"uppercase" }}>Navigation</div>
-    {NAV.map(n => (
+    {NAV.filter(n => !n.hideInSidebar).map(n => (
       <button key={n.key} onClick={() => onNav(n.key)} style={{
         display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
         borderRadius:10, border:"none", cursor:"pointer",
@@ -196,13 +208,18 @@ const TopBar = ({ page }) => {
   const item = NAV.find(n=>n.key===page)||NAV[0];
   return (
     <div style={{
-      height:60, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between",
+      height:72, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between",
       padding:"0 28px", borderBottom:"1px solid rgba(255,255,255,0.07)",
       background:"rgba(8,18,12,0.85)", backdropFilter:"blur(12px)", position:"sticky", top:0, zIndex:50,
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-        <span style={{ fontSize:18 }}>{item.icon}</span>
-        <span style={{ fontSize:15, fontWeight:700, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>{item.label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+        <div style={{ width:42, height:42, borderRadius:10, background:"rgba(74,222,128,0.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, color:"#4ADE80" }}>
+          {item.icon}
+        </div>
+        <div>
+          <div style={{ fontSize:15, fontWeight:700, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif", lineHeight:1.2 }}>{item.label}</div>
+          {item.sub && <div style={{ fontSize:11, color:"#64748B", marginTop:2 }}>{item.sub}</div>}
+        </div>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
         <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:8, padding:"5px 12px", fontSize:12, color:"#F8FAFC" }}>
@@ -745,11 +762,7 @@ const riskAlertsData = [
 const AiRecommendationsPage = () => {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
-        <div>
-          <div style={{ fontSize:24, fontWeight:800, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>AI Recommendations</div>
-          <div style={{ fontSize:14, color:"#94A3B8", marginTop:4 }}>Smart recommendations to help you take the right action.</div>
-        </div>
+      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:10 }}>
         <button style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, cursor:"pointer" }}>&lt; Back to Recommendations</button>
       </div>
 
@@ -867,11 +880,7 @@ const AiRecommendationsPage = () => {
 const VisitPlannerPage = () => {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
-        <div>
-          <div style={{ fontSize:24, fontWeight:800, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>Visit Planner</div>
-          <div style={{ fontSize:14, color:"#94A3B8", marginTop:4 }}>AI-powered visit planning to maximize your impact</div>
-        </div>
+      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:10 }}>
         <div style={{ display:"flex", gap:12 }}>
           <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8 }}><span><MapPin size={14}/></span> Patna Region ▾</div>
           <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8 }}><span><Calendar size={14}/></span> 09 Jun 2026 ▾</div>
@@ -1028,21 +1037,339 @@ const VisitPlannerPage = () => {
   );
 };
 
+// ─── RETAILER INSIGHTS PAGE ───────────────────────────────────────────────────
+const RetailerInsightsPage = () => {
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  
+  const filtered = retailerData.filter(r => {
+    const matchesSearch = r.name.toLowerCase().includes(search.toLowerCase()) || r.owner.toLowerCase().includes(search.toLowerCase());
+    if (filter === "All") return matchesSearch;
+    if (filter === "Low Stock") return matchesSearch && (r.stockLevel === "Critical" || r.stockLevel === "Low Stock");
+    if (filter === "Outstanding") return matchesSearch && r.outstanding > 0;
+    if (filter === "Active") return matchesSearch && r.status === "Active";
+    return matchesSearch;
+  });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+        <KpiCard icon={<Store size={22}/>} iconBg="rgba(74,222,128,0.2)" label="Total Retailers" value="5" valueColor="#4ADE80" sub="Active partners" />
+        <KpiCard icon={<AlertTriangle size={22}/>} iconBg="rgba(239,68,68,0.2)" label="Low Stock Alerts" value="3" valueColor="#EF4444" sub="Need replenishment" />
+        <KpiCard icon={<IndianRupee size={22}/>} iconBg="rgba(234,179,8,0.2)" label="Total Outstanding" value="₹40,000" valueColor="#EAB308" sub="Pending payments" />
+        <KpiCard icon={<TrendingUp size={22}/>} iconBg="rgba(56,189,248,0.2)" label="Sales Generated" value="₹7.16L" valueColor="#38BDF8" sub="This financial year" />
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10 }}>
+          {["All", "Low Stock", "Outstanding", "Active"].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              background: filter === f ? "#16A34A" : "rgba(255,255,255,0.05)",
+              color: filter === f ? "#FFF" : "#CBD5E1",
+              border: `1px solid ${filter === f ? "#16A34A" : "rgba(255,255,255,0.1)"}`,
+              borderRadius: 20, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s"
+            }}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", width: 260 }}>
+          <Search size={16} color="#64748B" />
+          <input type="text" placeholder="Search retailer or owner..." value={search} onChange={e => setSearch(e.target.value)} style={{
+            background: "transparent", border: "none", color: "#F8FAFC", fontSize: 13, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif"
+          }} />
+        </div>
+      </div>
+
+      <Card style={{ padding: 0, overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+              {["Retailer", "Location", "Last Visit", "Stock Level", "Outstanding Balance", "Total Sales", "Actions"].map(h => (
+                <th key={h} style={{ padding: "12px 16px", fontSize: 11, color: "#64748B", fontWeight: 700, textAlign: "left", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length > 0 ? (
+              filtered.map((r, i) => (
+                <tr key={r.id} style={{ background: i % 2 === 0 ? "rgba(255,255,255,0.01)" : "transparent", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <td style={{ padding: "14px 16px" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>{r.name}</div>
+                    <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Prop: {r.owner}</div>
+                  </td>
+                  <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.location}</td>
+                  <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.lastVisit}</td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 6,
+                      background: r.stockLevel === "Critical" ? "rgba(239,68,68,0.12)" : r.stockLevel === "Low Stock" ? "rgba(249,115,22,0.12)" : "rgba(74,222,128,0.12)",
+                      color: r.stockLevel === "Critical" ? "#EF4444" : r.stockLevel === "Low Stock" ? "#F97316" : "#4ADE80",
+                      border: `1px solid ${r.stockLevel === "Critical" ? "#EF444430" : r.stockLevel === "Low Stock" ? "#F9731630" : "#4ADE8030"}`
+                    }}>{r.stockLevel}</span>
+                  </td>
+                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: r.outstanding > 0 ? "#EAB308" : "#4ADE80" }}>
+                    {r.outstanding > 0 ? `₹${r.outstanding.toLocaleString()}` : "Clear"}
+                  </td>
+                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>₹{r.totalSales.toLocaleString()}</td>
+                  <td style={{ padding: "14px 16px" }}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button title="Call Retailer" style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Phone size={13} />
+                      </button>
+                      <button title="Message" style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <MessageSquare size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ padding: "30px 16px", textAlign: "center", color: "#64748B", fontSize: 13 }}>No retailers found matching filters.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Card>
+      <InfoBar text="Retailer sales & outstanding stats are automatically synced with regional ERP distributor databases." />
+    </div>
+  );
+};
+
+// ─── GROWER INSIGHTS PAGE ─────────────────────────────────────────────────────
+const GrowerInsightsPage = () => {
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  
+  const filtered = growerData.filter(g => {
+    const matchesSearch = g.name.toLowerCase().includes(search.toLowerCase()) || g.location.toLowerCase().includes(search.toLowerCase());
+    if (filter === "All") return matchesSearch;
+    return matchesSearch && g.crop === filter;
+  });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+        <KpiCard icon={<Users size={22}/>} iconBg="rgba(74,222,128,0.2)" label="Total Active Growers" value="5" valueColor="#4ADE80" sub="Registered under cluster" />
+        <KpiCard icon={<Wheat size={22}/>} iconBg="rgba(249,115,22,0.2)" label="Total Land Monitored" value="60 Acres" valueColor="#F97316" sub="Across Jhansi/Patna region" />
+        <KpiCard icon={<AlertTriangle size={22}/>} iconBg="rgba(239,68,68,0.2)" label="High Risk Crops" value="1" valueColor="#EF4444" sub="Need advisory updates" />
+        <KpiCard icon={<Activity size={22}/>} iconBg="rgba(56,189,248,0.2)" label="Average Crop Risk" value="38%" valueColor="#38BDF8" sub="Healthy overall index" />
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10 }}>
+          {["All", "Wheat", "Rice", "Cotton", "Maize"].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              background: filter === f ? "#16A34A" : "rgba(255,255,255,0.05)",
+              color: filter === f ? "#FFF" : "#CBD5E1",
+              border: `1px solid ${filter === f ? "#16A34A" : "rgba(255,255,255,0.1)"}`,
+              borderRadius: 20, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s"
+            }}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", width: 260 }}>
+          <Search size={16} color="#64748B" />
+          <input type="text" placeholder="Search grower or village..." value={search} onChange={e => setSearch(e.target.value)} style={{
+            background: "transparent", border: "none", color: "#F8FAFC", fontSize: 13, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif"
+          }} />
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {filtered.length > 0 ? (
+          filtered.map(g => (
+            <Card key={g.id} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"#F8FAFC" }}>{g.name}</div>
+                  <div style={{ fontSize:12, color:"#64748B", marginTop:3, display:"flex", alignItems:"center", gap:4 }}><MapPin size={12}/> {g.location} | Land: {g.land}</div>
+                </div>
+                <span style={{
+                  fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4,
+                  background: g.risk === "High Risk" ? "rgba(239,68,68,0.12)" : g.risk === "Medium Risk" ? "rgba(249,115,22,0.12)" : "rgba(74,222,128,0.12)",
+                  color: g.risk === "High Risk" ? "#EF4444" : g.risk === "Medium Risk" ? "#F97316" : "#4ADE80",
+                  border: `1px solid ${g.risk === "High Risk" ? "#EF444430" : g.risk === "Medium Risk" ? "#F9731630" : "#4ADE8030"}`
+                }}>{g.risk}</span>
+              </div>
+
+              <div style={{ display: "flex", gap: 20, background: "rgba(255,255,255,0.02)", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.04)" }}>
+                <div>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>Crop Monitored</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#4ADE80", marginTop:3, display:"flex", alignItems:"center", gap:4 }}><Wheat size={14}/> {g.crop}</div>
+                </div>
+                <div style={{ borderLeft: "1px solid rgba(255,255,255,0.08)", paddingLeft: 16 }}>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>Growth Stage</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F8FAFC", marginTop:3 }}>{g.stage}</div>
+                </div>
+                <div style={{ borderLeft: "1px solid rgba(255,255,255,0.08)", paddingLeft: 16 }}>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>Last Visited</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#CBD5E1", marginTop:3 }}>{g.lastContact}</div>
+                </div>
+              </div>
+
+              <div style={{ background: "rgba(74,222,128,0.05)", border: "1px solid rgba(74,222,128,0.1)", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ fontSize: 10, color: "#4ADE80", fontWeight: 700, display:"flex", alignItems:"center", gap:4 }}>⚡ AI Active Advisory</div>
+                <div style={{ fontSize: 12, color: "#CBD5E1", marginTop:4, lineHeight:1.5 }}>{g.advisory}</div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 10 }}>
+                <div style={{ fontSize: 11, color: "#475569" }}>Contact: {g.phone}</div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Phone size={13} />
+                  </button>
+                  <button style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <MessageSquare size={13} />
+                  </button>
+                  <button style={{ background: "rgba(74,222,128,0.1)", color: "#4ADE80", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 6, padding: "0 12px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Advisory Details</button>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <div style={{ gridColumn: "span 2", padding: "40px", textAlign: "center", color: "#64748B", fontSize: 13 }}>No growers found matching filters.</div>
+        )}
+      </div>
+      <InfoBar text="Grower list and advisory states are synchronized dynamically when crop recommendations are accepted." />
+    </div>
+  );
+};
+
+// ─── SETTINGS PAGE ────────────────────────────────────────────────────────────
+const SettingsPage = () => {
+  const [depot, setDepot] = useState("Jhansi Depot");
+  const [stockAlerts, setStockAlerts] = useState(true);
+  const [riskAlerts, setRiskAlerts] = useState(true);
+  const [weatherAlerts, setWeatherAlerts] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [lastSync, setLastSync] = useState("10 June 2026, 04:30 AM");
+
+  const handleSync = () => {
+    setSyncing(true);
+    setTimeout(() => {
+      setSyncing(false);
+      const now = new Date();
+      setLastSync(now.toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }));
+    }, 1500);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 800 }}>
+      <Card style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(74,222,128,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: "#4ADE80", fontWeight: 700 }}>
+          AS
+        </div>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#F8FAFC", fontFamily: "'Space Grotesk',sans-serif" }}>Amit Sharma</div>
+          <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>Field Representative | Jhansi Region</div>
+          <div style={{ fontSize: 11, color: "#475569", marginTop: 4 }}>Employee ID: #AGR-49102  •  amit.sharma@agroai.com</div>
+        </div>
+      </Card>
+
+      <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Regional Configuration</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <label style={{ fontSize: 12, color: "#94A3B8" }}>Primary Warehousing Depot</label>
+          <select value={depot} onChange={e => setDepot(e.target.value)} style={{
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+            padding: "10px 14px", color: "#CBD5E1", fontSize: 13, width: "100%", outline: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif"
+          }}>
+            <option value="Jhansi Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Jhansi Depot (Primary)</option>
+            <option value="Agra Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Agra Depot</option>
+            <option value="Kanpur Depot" style={{ background: "#0D1F12", color: "#CBD5E1" }}>Kanpur Depot</option>
+          </select>
+        </div>
+      </Card>
+
+      <Card style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 10 }}>Notification Alerts</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {[
+            { label: "Critical Stock Alerts", desc: "Notify immediately when product inventory levels drop below 20%", state: stockAlerts, setState: setStockAlerts },
+            { label: "High Crop Risk Advisories", desc: "Notify when local farm risk indexes increase to High", state: riskAlerts, setState: setRiskAlerts },
+            { label: "Weather Anomalies", desc: "Notify if rain forecast probability is above 60% during field visits", state: weatherAlerts, setState: setWeatherAlerts }
+          ].map(opt => (
+            <div key={opt.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#CBD5E1" }}>{opt.label}</div>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{opt.desc}</div>
+              </div>
+              <button onClick={() => opt.setState(s => !s)} style={{
+                background: opt.state ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.05)",
+                border: `1px solid ${opt.state ? "#4ADE80" : "rgba(255,255,255,0.1)"}`,
+                color: opt.state ? "#4ADE80" : "#64748B",
+                borderRadius: 20, padding: "6px 14px", fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.15s"
+              }}>
+                {opt.state ? "Enabled" : "Disabled"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Offline Data Synchronization</div>
+          <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Last synced: {lastSync}</div>
+        </div>
+        <button onClick={handleSync} disabled={syncing} style={{
+          background: syncing ? "rgba(255,255,255,0.05)" : "rgba(74,222,128,0.12)",
+          color: syncing ? "#64748B" : "#4ADE80",
+          border: `1px solid ${syncing ? "rgba(255,255,255,0.1)" : "rgba(74,222,128,0.25)"}`,
+          borderRadius: 8, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: syncing ? "default" : "pointer", transition: "all 0.15s"
+        }}>
+          {syncing ? "Syncing..." : "Sync Now"}
+        </button>
+      </Card>
+    </div>
+  );
+};
+
+// ─── SKELETON LOADER ──────────────────────────────────────────────────────────
+const SkeletonLoader = () => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="shimmer-bg" style={{ height: 120, borderRadius: 14 }} />
+      ))}
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
+      <div className="shimmer-bg" style={{ height: 320, borderRadius: 16 }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="shimmer-bg" style={{ height: 152, borderRadius: 16 }} />
+        <div className="shimmer-bg" style={{ height: 152, borderRadius: 16 }} />
+      </div>
+    </div>
+  </div>
+);
+
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage]   = useState("dashboard");
+  const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState(todayTasks.map(t=>({...t, done:false})));
   const toggleTask = id => setTasks(p=>p.map(t=>t.id===id?{...t,done:!t.done}:t));
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 500ms transition time
+    return () => clearTimeout(timer);
+  }, [page]);
 
   const PAGES = {
     dashboard: <Overview tasks={tasks} onToggleTask={toggleTask} onNav={setPage} />,
     visitPlanner: <VisitPlannerPage />,
     aiRecommendations: <AiRecommendationsPage />,
     riskAnalyzer: <RiskAnalyzerPage />,
-    retailerInsights: <PlaceholderPage title="Retailer Insights" />,
-    growerInsights: <PlaceholderPage title="Grower Insights" />,
+    retailerInsights: <RetailerInsightsPage />,
+    growerInsights: <GrowerInsightsPage />,
     analytics: <PlaceholderPage title="Analytics" />,
-    settings: <PlaceholderPage title="Settings" />,
+    settings: <SettingsPage />,
     visit:    <VisitPage />,
     revenue:  <RevenuePage />,
     stock:    <StockPage />,
@@ -1053,11 +1380,22 @@ export default function App() {
   return (
     <div style={{ display:"flex", height:"100vh", background:"linear-gradient(160deg,#0A1A0F 0%,#0D1F12 50%,#080F10 100%)", fontFamily:"'DM Sans',sans-serif", overflow:"hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .shimmer-bg {
+          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite linear;
+        }
+      `}</style>
       <Sidebar active={page} onNav={setPage} />
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
         <TopBar page={page} />
         <main style={{ flex:1, overflowY:"auto", padding:"28px 32px" }}>
-          {PAGES[page]}
+          {loading ? <SkeletonLoader /> : PAGES[page]}
         </main>
       </div>
     </div>
