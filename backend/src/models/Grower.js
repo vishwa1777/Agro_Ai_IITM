@@ -29,7 +29,6 @@ const growerSchema =
     { timestamps: true }
   );
 
-export default mongoose.model(
-  "Grower",
-  growerSchema
-);
+const Grower = mongoose.models.Grower || mongoose.model("Grower", growerSchema);
+
+export default Grower;
