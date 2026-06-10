@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUIStore } from '@/store';
-import { Leaf, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Leaf, Mail, Lock, AlertCircle, User, TrendingUp } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const { login } = useUIStore();
@@ -117,7 +117,7 @@ const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedRole('representative')}
-            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer"
+            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer flex items-center justify-center gap-2"
             style={{
               background: selectedRole === 'representative' ? 'rgba(85, 216, 64, 0.15)' : 'transparent',
               color: selectedRole === 'representative' ? '#55D840' : '#AAB8AA',
@@ -127,12 +127,13 @@ const LoginPage: React.FC = () => {
               cursor: 'pointer'
             }}
           >
-            🧑‍🌾 Representative
+            <User className="size-4" />
+            <span>Representative</span>
           </button>
           <button
             type="button"
             onClick={() => setSelectedRole('manager')}
-            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer"
+            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer flex items-center justify-center gap-2"
             style={{
               background: selectedRole === 'manager' ? 'rgba(85, 216, 64, 0.15)' : 'transparent',
               color: selectedRole === 'manager' ? '#55D840' : '#AAB8AA',
@@ -142,7 +143,8 @@ const LoginPage: React.FC = () => {
               cursor: 'pointer'
             }}
           >
-            📈 District Manager
+            <TrendingUp className="size-4" />
+            <span>District Manager</span>
           </button>
         </div>
 

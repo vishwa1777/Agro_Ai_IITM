@@ -3,7 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { useUIStore } from "./store";
 import ManagerApp from "./components/manager/ManagerApp";
 import LoginPage from "./components/auth/LoginPage";
-import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, ChevronDown, Check, X, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, Bug, FlaskConical, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, TrendingDown, Minus, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf } from "lucide-react";
+import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, ChevronDown, Check, X, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, Bug, FlaskConical, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, TrendingDown, Minus, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf, ArrowRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Area, AreaChart, PieChart, Pie, LineChart, Line } from "recharts";
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
@@ -92,8 +92,8 @@ const InfoBar = ({ text }) => (
   </div>
 );
 
-const Card = ({ children, style={} }) => (
-  <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:16, padding:"22px 24px", ...style }}>{children}</div>
+const Card = ({ children, style={}, ...props }) => (
+  <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:16, padding:"22px 24px", ...style }} {...props}>{children}</div>
 );
 
 // Filter Dropdown
@@ -383,9 +383,14 @@ const Overview = ({ tasks, onToggleTask, onNav, onOpenTask, onOpenCropRisk }) =>
               }}
                 onClick={() => {
                   if (task.type === "Visit") {
-                    const growerName = task.text.split("—")[0].trim();
-                    const grower = growerData.find(g => g.name.toLowerCase().includes(growerName.toLowerCase()));
-                    onOpenTask({ type: "grower", data: grower || growerData[0] });
+                    const cleanText = task.text.replace("Visit ", "").split("—")[0].trim();
+                    const retailer = retailerData.find(r => cleanText.toLowerCase().includes(r.name.toLowerCase()));
+                    if (retailer) {
+                      onOpenTask({ type: "retailer", data: retailer });
+                    } else {
+                      const grower = growerData.find(g => cleanText.toLowerCase().includes(g.name.toLowerCase())) || growerData[0];
+                      onOpenTask({ type: "grower", data: grower });
+                    }
                   } else if (task.type === "Stock") {
                     const product = stockData.find(s => task.text.toLowerCase().includes(s.name.toLowerCase())) || stockData[0];
                     onOpenTask({ type: "stock", data: { ...product, warehouse: "Jhansi Depot" } });
@@ -1650,11 +1655,52 @@ const riskAlertsData = [
 ];
 
 // ─── AI RECOMMENDATIONS PAGE ──────────────────────────────────────────────────
-const AiRecommendationsPage = () => {
+const AiRecommendationsPage = ({ onNav, onApplyRecommendation }) => {
+  const [toast, setToast] = useState(null);
+  const [applied, setApplied] = useState(false);
+
+  const triggerToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:20, position: "relative" }}>
+      {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: "fixed",
+          top: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(10, 24, 15, 0.95)",
+          border: "1px solid #4ADE80",
+          borderRadius: 10,
+          padding: "12px 24px",
+          color: "#4ADE80",
+          fontSize: 13,
+          fontWeight: 700,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          zIndex: 2000,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          backdropFilter: "blur(8px)",
+          animation: "slideDown 0.3s ease"
+        }}>
+          <Leaf size={16} /> {toast}
+        </div>
+      )}
+
       <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:10 }}>
-        <button style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, cursor:"pointer" }}>&lt; Back to Recommendations</button>
+        <button 
+          onClick={() => onNav && onNav("dashboard")}
+          style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, cursor:"pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"; e.currentTarget.style.background = "rgba(74,222,128,0.05)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+        >
+          &lt; Back to Recommendations
+        </button>
       </div>
 
       <Card style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -1665,7 +1711,7 @@ const AiRecommendationsPage = () => {
             <span style={{ fontSize:9, color:"#94A3B8" }}>Score</span>
           </div>
           <div>
-            <div style={{ fontSize:18, fontWeight:700, color:"#F8FAFC" }}>Cotton — Nutrient Advisory</div>
+            <div style={{ fontSize:18, fontWeight:700, color:"#F8FAFC" }}>Cotton — Pest Advisory</div>
             <div style={{ fontSize:12, color:"#94A3B8", marginTop:4 }}>Patna Tehsil, Patna  |  Farmer cluster near Kisan Seed Store (Patna #1)</div>
           </div>
         </div>
@@ -1705,7 +1751,7 @@ const AiRecommendationsPage = () => {
               "Whitefly and Bollworm risk detected in nearby fields",
               "Cotton crop is in Tillering stage - high vulnerability period",
               "Weather conditions (28°C, Low Humidity) favor pest spread",
-              "Ridomil Gold is available in retailer stock",
+              "Actara 25 WG is available in retailer stock",
               "Similar recommendations showed 87% success rate",
               <span key="rev">Estimated revenue opportunity: <span style={{color:"#4ADE80"}}>₹12,500</span></span>
             ].map((text,i)=>(
@@ -1723,14 +1769,18 @@ const AiRecommendationsPage = () => {
         <div style={{ display:"flex", gap:20, alignItems:"center", justifyContent:"space-between", flexWrap:"wrap" }}>
           
           <div style={{ display:"flex", gap:20, alignItems:"center" }}>
-            <div style={{ width:60, height:80, background:"#fff", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <div style={{ width:30, height:50, background:"linear-gradient(#4ADE80,#16A34A)", borderRadius:4 }}></div>
+            <div style={{ width:60, height:80, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <div style={{ width:36, height:52, background:"linear-gradient(135deg,#064e3b,#022c22)", border:"1px solid rgba(74,222,128,0.3)", borderRadius:4, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:2 }}>
+                <span style={{ fontSize:7, color:"#A7F3D0", fontWeight:700, letterSpacing:0.5 }}>SYNGENTA</span>
+                <div style={{ width:18, height:18, borderRadius:"50%", background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", marginTop:4 }}><Leaf size={10} color="#4ADE80"/></div>
+                <span style={{ fontSize:6, color:"#6EE7B7", marginTop:4, fontWeight:700 }}>25 WG</span>
+              </div>
             </div>
             <div>
               <div style={{ fontSize:11, color:"#94A3B8" }}>Recommended Product</div>
-              <div style={{ fontSize:18, fontWeight:700, color:"#F8FAFC", marginTop:2 }}>Ridomil Gold</div>
+              <div style={{ fontSize:18, fontWeight:700, color:"#F8FAFC", marginTop:2 }}>Actara 25 WG</div>
               <div style={{ fontSize:11, color:"#94A3B8", marginTop:6 }}>Dosage</div>
-              <div style={{ fontSize:13, color:"#F8FAFC" }}>150 ml/acre</div>
+              <div style={{ fontSize:13, color:"#F8FAFC" }}>80 g/acre</div>
             </div>
           </div>
           
@@ -1742,25 +1792,74 @@ const AiRecommendationsPage = () => {
           <div style={{ borderLeft:"1px solid rgba(255,255,255,0.1)", paddingLeft:20 }}>
             <div style={{ fontSize:11, color:"#94A3B8" }}>Stock Status</div>
             <div style={{ fontSize:14, fontWeight:500, color:"#4ADE80", marginTop:4 }}>Available</div>
-            <div style={{ fontSize:11, color:"#94A3B8", background:"rgba(255,255,255,0.05)", padding:"2px 8px", borderRadius:4, marginTop:6, display:"inline-block" }}>150 Units</div>
+            <div style={{ fontSize:11, color:"#94A3B8", background:"rgba(255,255,255,0.05)", padding:"2px 8px", borderRadius:4, marginTop:6, display:"inline-block" }}>80 Units</div>
           </div>
 
           <div style={{ background:"rgba(74,222,128,0.1)", border:"1px solid rgba(74,222,128,0.2)", borderRadius:12, padding:"16px 20px", display:"flex", alignItems:"center", gap:16, flex:1 }}>
-            <div style={{ fontSize:24, color:"#4ADE80" }}><Calendar size={24}/></div>
+            <div style={{ fontSize:24, color:"#4ADE80" }}><MapPin size={24}/></div>
             <div style={{ flex:1 }}>
               <div style={{ fontSize:12, color:"#4ADE80", fontWeight:600 }}>Next Best Action</div>
               <div style={{ fontSize:15, color:"#F8FAFC", fontWeight:700, marginTop:2 }}>Visit Kisan Seed Store (Patna #1)</div>
               <div style={{ fontSize:13, color:"#CBD5E1", marginTop:2 }}>Within 3 days</div>
             </div>
-            <button style={{ background:"rgba(74,222,128,0.2)", border:"none", borderRadius:8, width:40, height:40, color:"#4ADE80", cursor:"pointer" }}><Calendar size={24}/></button>
+            <button 
+              onClick={() => onNav && onNav("visitPlanner")}
+              style={{ background:"rgba(74,222,128,0.2)", border:"none", borderRadius:8, width:40, height:40, color:"#4ADE80", cursor:"pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.35)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(74,222,128,0.2)"; }}
+              title="Add to Calendar / Visit Planner"
+            >
+              <ArrowRight size={20}/>
+            </button>
           </div>
           
         </div>
 
         <div style={{ display:"flex", gap:16, marginTop:30, borderTop:"1px solid rgba(255,255,255,0.05)", paddingTop:20 }}>
-          <button style={{ flex:1, background:"#16A34A", color:"#fff", border:"none", borderRadius:8, padding:"14px", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"center", gap:8 }}><span><Check size={14}/></span> Apply Recommendation</button>
-          <button style={{ flex:1, background:"rgba(255,255,255,0.05)", color:"#F8FAFC", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"14px", fontSize:14, fontWeight:600, cursor:"pointer" }}>Dismiss</button>
-          <button style={{ flex:1, background:"transparent", color:"#CBD5E1", border:"1px dashed rgba(255,255,255,0.2)", borderRadius:8, padding:"14px", fontSize:14, fontWeight:600, cursor:"pointer", display:"flex", justifyContent:"center", gap:8 }}><span><ExternalLink size={14}/></span> Share Recommendation</button>
+          <button 
+            onClick={() => {
+              if (!applied) {
+                onApplyRecommendation && onApplyRecommendation("Visit Kisan Seed Store (Patna #1) — AI Recommendation");
+                setApplied(true);
+                triggerToast("AI Recommendation applied! Task added to Dashboard checklist.");
+              }
+            }}
+            disabled={applied}
+            style={{ 
+              flex:1, 
+              background: applied ? "rgba(74,222,128,0.12)" : "#16A34A", 
+              color: applied ? "#4ADE80" : "#fff", 
+              border: applied ? "1px solid rgba(74,222,128,0.3)" : "none", 
+              borderRadius:8, padding:"14px", fontSize:14, fontWeight:700, 
+              cursor: applied ? "default" : "pointer", 
+              display:"flex", justifyContent:"center", alignItems:"center", gap:8, 
+              transition: "all 0.2s" 
+            }}
+            onMouseEnter={e => { if(!applied) e.currentTarget.style.background = "#15803d"; }}
+            onMouseLeave={e => { if(!applied) e.currentTarget.style.background = "#16A34A"; }}
+          >
+            {applied ? (
+              <><span><Check size={14}/></span> Applied Successfully</>
+            ) : (
+              <><span><Check size={14}/></span> Apply Recommendation</>
+            )}
+          </button>
+          <button 
+            onClick={() => triggerToast("Recommendation dismissed.")}
+            style={{ flex:1, background:"rgba(255,255,255,0.05)", color:"#F8FAFC", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"14px", fontSize:14, fontWeight:600, cursor:"pointer", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+          >
+            Dismiss
+          </button>
+          <button 
+            onClick={() => triggerToast("Recommendation shared successfully via WhatsApp/Email!")}
+            style={{ flex:1, background:"transparent", color:"#CBD5E1", border:"1px dashed rgba(255,255,255,0.2)", borderRadius:8, padding:"14px", fontSize:14, fontWeight:600, cursor:"pointer", display:"flex", justifyContent:"center", alignItems:"center", gap:8, transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; e.currentTarget.style.color = "#CBD5E1"; }}
+          >
+            <span><ExternalLink size={14}/></span> Share Recommendation
+          </button>
         </div>
       </Card>
     </div>
@@ -1769,7 +1868,7 @@ const AiRecommendationsPage = () => {
 
 // ─── VISIT PLANNER PAGE ───────────────────────────────────────────────────────
 const VisitPlannerPage = () => {
-  const [region, setRegion] = useState("Patna Region");
+  const [region, setRegion] = useState("Jhansi Region");
   const [showRegionDropdown, setShowRegionDropdown] = useState(false);
   const [date, setDate] = useState("09 Jun 2026");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
@@ -2841,9 +2940,15 @@ const VisitPlannerPage = () => {
 };
 
 // ─── RETAILER INSIGHTS PAGE ───────────────────────────────────────────────────
-const RetailerInsightsPage = ({ initialSearch = "", initialFilter = "All" }) => {
+const RetailerInsightsPage = ({ initialSearch = "", initialFilter = "All", onOpenTask }) => {
   const [filter, setFilter] = useState(initialFilter);
   const [search, setSearch] = useState(initialSearch);
+  const [toast, setToast] = useState(null);
+
+  const triggerToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     setSearch(initialSearch);
@@ -2863,7 +2968,32 @@ const RetailerInsightsPage = ({ initialSearch = "", initialFilter = "All" }) => 
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative" }}>
+      {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: "fixed",
+          top: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(10, 24, 15, 0.95)",
+          border: "1px solid #4ADE80",
+          borderRadius: 10,
+          padding: "12px 24px",
+          color: "#4ADE80",
+          fontSize: 13,
+          fontWeight: 700,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          zIndex: 2000,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          backdropFilter: "blur(8px)",
+          animation: "slideDown 0.3s ease"
+        }}>
+          <Leaf size={16} /> {toast}
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         <KpiCard icon={<Store size={22}/>} iconBg="rgba(74,222,128,0.2)" label="Total Retailers" value="5" valueColor="#4ADE80" sub="Active partners" />
         <KpiCard icon={<AlertTriangle size={22}/>} iconBg="rgba(239,68,68,0.2)" label="Low Stock Alerts" value="3" valueColor="#EF4444" sub="Need replenishment" />
@@ -2910,38 +3040,65 @@ const RetailerInsightsPage = ({ initialSearch = "", initialFilter = "All" }) => 
           </thead>
           <tbody>
             {filtered.length > 0 ? (
-              filtered.map((r, i) => (
-                <tr key={r.id} style={{ background: i % 2 === 0 ? "rgba(255,255,255,0.01)" : "transparent", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "14px 16px" }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>{r.name}</div>
-                    <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Prop: {r.owner}</div>
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.location}</td>
-                  <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.lastVisit}</td>
-                  <td style={{ padding: "14px 16px" }}>
-                    <span style={{
-                      fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 6,
-                      background: r.stockLevel === "Critical" ? "rgba(239,68,68,0.12)" : r.stockLevel === "Low Stock" ? "rgba(249,115,22,0.12)" : "rgba(74,222,128,0.12)",
-                      color: r.stockLevel === "Critical" ? "#EF4444" : r.stockLevel === "Low Stock" ? "#F97316" : "#4ADE80",
-                      border: `1px solid ${r.stockLevel === "Critical" ? "#EF444430" : r.stockLevel === "Low Stock" ? "#F9731630" : "#4ADE8030"}`
-                    }}>{r.stockLevel}</span>
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: r.outstanding > 0 ? "#EAB308" : "#4ADE80" }}>
-                    {r.outstanding > 0 ? `₹${r.outstanding.toLocaleString()}` : "Clear"}
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>₹{r.totalSales.toLocaleString()}</td>
-                  <td style={{ padding: "14px 16px" }}>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button title="Call Retailer" style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Phone size={13} />
-                      </button>
-                      <button title="Message" style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <MessageSquare size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              filtered.map((r, i) => {
+                const isEven = i % 2 === 0;
+                return (
+                  <tr 
+                    key={r.id} 
+                    onClick={() => onOpenTask && onOpenTask({ type: "retailer", data: r })}
+                    style={{ 
+                      background: isEven ? "rgba(255,255,255,0.01)" : "transparent", 
+                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      cursor: "pointer",
+                      transition: "all 0.15s"
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.04)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = isEven ? "rgba(255,255,255,0.01)" : "transparent"; }}
+                  >
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>{r.name}</div>
+                      <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Prop: {r.owner}</div>
+                    </td>
+                    <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.location}</td>
+                    <td style={{ padding: "14px 16px", fontSize: 12, color: "#CBD5E1" }}>{r.lastVisit}</td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 6,
+                        background: r.stockLevel === "Critical" ? "rgba(239,68,68,0.12)" : r.stockLevel === "Low Stock" ? "rgba(249,115,22,0.12)" : "rgba(74,222,128,0.12)",
+                        color: r.stockLevel === "Critical" ? "#EF4444" : r.stockLevel === "Low Stock" ? "#F97316" : "#4ADE80",
+                        border: `1px solid ${r.stockLevel === "Critical" ? "#EF444430" : r.stockLevel === "Low Stock" ? "#F9731630" : "#4ADE8030"}`
+                      }}>{r.stockLevel}</span>
+                    </td>
+                    <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: r.outstanding > 0 ? "#EAB308" : "#4ADE80" }}>
+                      {r.outstanding > 0 ? `₹${r.outstanding.toLocaleString()}` : "Clear"}
+                    </td>
+                    <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 700, color: "#F8FAFC" }}>₹{r.totalSales.toLocaleString()}</td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <a 
+                          href={`tel:${r.phone}`}
+                          onClick={e => e.stopPropagation()}
+                          title={`Call ${r.name}`} 
+                          style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", transition: "all 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.2)"; e.currentTarget.style.color = "#4ADE80"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#CBD5E1"; }}
+                        >
+                          <Phone size={13} />
+                        </a>
+                        <button 
+                          onClick={e => { e.stopPropagation(); triggerToast(`SMS alert sent to ${r.owner} (${r.name}) successfully.`); }}
+                          title={`Message ${r.name}`} 
+                          style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "rgba(56,189,248,0.2)"; e.currentTarget.style.color = "#38BDF8"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#CBD5E1"; }}
+                        >
+                          <MessageSquare size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="7" style={{ padding: "30px 16px", textAlign: "center", color: "#64748B", fontSize: 13 }}>No retailers found matching filters.</td>
@@ -2956,9 +3113,15 @@ const RetailerInsightsPage = ({ initialSearch = "", initialFilter = "All" }) => 
 };
 
 // ─── GROWER INSIGHTS PAGE ─────────────────────────────────────────────────────
-const GrowerInsightsPage = ({ initialSearch = "" }) => {
+const GrowerInsightsPage = ({ initialSearch = "", onOpenTask }) => {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState(initialSearch);
+  const [toast, setToast] = useState(null);
+
+  const triggerToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     setSearch(initialSearch);
@@ -2971,7 +3134,32 @@ const GrowerInsightsPage = ({ initialSearch = "" }) => {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative" }}>
+      {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: "fixed",
+          top: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(10, 24, 15, 0.95)",
+          border: "1px solid #4ADE80",
+          borderRadius: 10,
+          padding: "12px 24px",
+          color: "#4ADE80",
+          fontSize: 13,
+          fontWeight: 700,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          zIndex: 2000,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          backdropFilter: "blur(8px)",
+          animation: "slideDown 0.3s ease"
+        }}>
+          <Leaf size={16} /> {toast}
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
         <KpiCard icon={<Users size={22}/>} iconBg="rgba(74,222,128,0.2)" label="Total Active Growers" value="5" valueColor="#4ADE80" sub="Registered under cluster" />
         <KpiCard icon={<Wheat size={22}/>} iconBg="rgba(249,115,22,0.2)" label="Total Land Monitored" value="60 Acres" valueColor="#F97316" sub="Across Jhansi/Patna region" />
@@ -3010,7 +3198,20 @@ const GrowerInsightsPage = ({ initialSearch = "" }) => {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {filtered.length > 0 ? (
           filtered.map(g => (
-            <Card key={g.id} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <Card 
+              key={g.id} 
+              onClick={() => onOpenTask && onOpenTask({ type: "grower", data: g })}
+              style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 14,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                border: "1px solid rgba(255,255,255,0.05)"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(74,222,128,0.25)"; e.currentTarget.style.background = "rgba(74,222,128,0.02)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.background = "transparent"; }}
+            >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"#F8FAFC" }}>{g.name}</div>
@@ -3047,13 +3248,33 @@ const GrowerInsightsPage = ({ initialSearch = "" }) => {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 10 }}>
                 <div style={{ fontSize: 11, color: "#475569" }}>Contact: {g.phone}</div>
                 <div style={{ display: "flex", gap: 6 }}>
-                  <button style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <a 
+                    href={`tel:${g.phone}`}
+                    onClick={e => e.stopPropagation()}
+                    title={`Call ${g.name}`}
+                    style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", transition: "all 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.2)"; e.currentTarget.style.color = "#4ADE80"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#CBD5E1"; }}
+                  >
                     <Phone size={13} />
-                  </button>
-                  <button style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  </a>
+                  <button 
+                    onClick={e => { e.stopPropagation(); triggerToast(`Advisory alert SMS sent to ${g.name} successfully.`); }}
+                    title={`Message ${g.name}`}
+                    style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#CBD5E1", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(56,189,248,0.2)"; e.currentTarget.style.color = "#38BDF8"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#CBD5E1"; }}
+                  >
                     <MessageSquare size={13} />
                   </button>
-                  <button style={{ background: "rgba(74,222,128,0.1)", color: "#4ADE80", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 6, padding: "0 12px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Advisory Details</button>
+                  <button 
+                    onClick={e => { e.stopPropagation(); onOpenTask && onOpenTask({ type: "grower", data: g }); }}
+                    style={{ background: "rgba(74,222,128,0.1)", color: "#4ADE80", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 6, padding: "0 12px", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.2)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(74,222,128,0.1)"; }}
+                  >
+                    Advisory Details
+                  </button>
                 </div>
               </div>
             </Card>
@@ -4155,10 +4376,24 @@ export default function App() {
   const PAGES = {
     dashboard: <Overview tasks={tasks} onToggleTask={toggleTask} onNav={handleNav} onOpenTask={setDrawerData} onOpenCropRisk={setCropDrawerData} />,
     visitPlanner: <VisitPlannerPage />,
-    aiRecommendations: <AiRecommendationsPage />,
+    aiRecommendations: (
+      <AiRecommendationsPage 
+        onNav={handleNav} 
+        onApplyRecommendation={(taskText) => {
+          const newTask = {
+            id: Date.now(),
+            type: "Visit",
+            text: taskText,
+            time: "5:00 PM",
+            done: false
+          };
+          setTasks(prev => [...prev, newTask]);
+        }} 
+      />
+    ),
     riskAnalyzer: <RiskAnalyzerPage />,
-    retailerInsights: <RetailerInsightsPage initialSearch={retailerSearch} initialFilter={retailerFilter} />,
-    growerInsights: <GrowerInsightsPage initialSearch={growerSearch} />,
+    retailerInsights: <RetailerInsightsPage initialSearch={retailerSearch} initialFilter={retailerFilter} onOpenTask={setDrawerData} />,
+    growerInsights: <GrowerInsightsPage initialSearch={growerSearch} onOpenTask={setDrawerData} />,
     analytics: <AnalyticsPage />,
     settings: <SettingsPage />,
     visit:    <VisitPage onNav={handleNav} />,
