@@ -4169,7 +4169,11 @@ export default function App() {
   };
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return (
+      <div id="manager-root" className="dark">
+        <LoginPage />
+      </div>
+    );
   }
 
   if (role === "manager") {

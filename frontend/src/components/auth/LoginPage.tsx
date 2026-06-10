@@ -117,11 +117,14 @@ const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedRole('representative')}
-            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300"
+            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer"
             style={{
               background: selectedRole === 'representative' ? 'rgba(85, 216, 64, 0.15)' : 'transparent',
               color: selectedRole === 'representative' ? '#55D840' : '#AAB8AA',
-              boxShadow: selectedRole === 'representative' ? '0 0 10px rgba(85, 216, 64, 0.1)' : 'none'
+              boxShadow: selectedRole === 'representative' ? '0 0 10px rgba(85, 216, 64, 0.1)' : 'none',
+              border: 'none',
+              outline: 'none',
+              cursor: 'pointer'
             }}
           >
             🧑‍🌾 Representative
@@ -129,11 +132,14 @@ const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedRole('manager')}
-            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300"
+            className="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-300 border-none outline-none cursor-pointer"
             style={{
               background: selectedRole === 'manager' ? 'rgba(85, 216, 64, 0.15)' : 'transparent',
               color: selectedRole === 'manager' ? '#55D840' : '#AAB8AA',
-              boxShadow: selectedRole === 'manager' ? '0 0 10px rgba(85, 216, 64, 0.1)' : 'none'
+              boxShadow: selectedRole === 'manager' ? '0 0 10px rgba(85, 216, 64, 0.1)' : 'none',
+              border: 'none',
+              outline: 'none',
+              cursor: 'pointer'
             }}
           >
             📈 District Manager
@@ -163,9 +169,10 @@ const LoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full bg-black/20 border border-[rgba(120,255,120,0.1)] focus:border-[#55D840] text-sm text-white rounded-lg pl-10 pr-4 py-2.5 outline-hidden transition-all placeholder:text-[#475569]"
+                className="w-full bg-[#0F1D14] border border-[rgba(120,255,120,0.15)] focus:border-[#55D840] text-sm text-white rounded-lg pl-10 pr-4 py-2.5 outline-none transition-all placeholder:text-[#475569]"
                 style={{
-                  boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+                  boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
+                  outline: 'none'
                 }}
               />
             </div>
@@ -187,9 +194,10 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-black/20 border border-[rgba(120,255,120,0.1)] focus:border-[#55D840] text-sm text-white rounded-lg pl-10 pr-4 py-2.5 outline-hidden transition-all placeholder:text-[#475569]"
+                className="w-full bg-[#0F1D14] border border-[rgba(120,255,120,0.15)] focus:border-[#55D840] text-sm text-white rounded-lg pl-10 pr-4 py-2.5 outline-none transition-all placeholder:text-[#475569]"
                 style={{
-                  boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+                  boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
+                  outline: 'none'
                 }}
               />
             </div>
