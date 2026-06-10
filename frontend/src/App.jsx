@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { useUIStore } from "./store";
+import ManagerApp from "./components/manager/ManagerApp";
 import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, ChevronDown, Check, X, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, Bug, FlaskConical, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, TrendingDown, Minus, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Area, AreaChart, PieChart, Pie, LineChart, Line } from "recharts";
 
@@ -161,47 +164,87 @@ const KpiCard = ({ icon, iconBg, label, value, valueColor, sub, onClick }) => (
 );
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
-const Sidebar = ({ active, onNav }) => (
-  <aside style={{
-    width:240, flexShrink:0, background:"rgba(8,18,12,0.97)",
-    borderRight:"1px solid rgba(255,255,255,0.07)",
-    display:"flex", flexDirection:"column", padding:"28px 16px",
-    gap:4, height:"100vh", position:"sticky", top:0,
-  }}>
-    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0 8px 28px" }}>
-      <div style={{ width:38, height:38, borderRadius:10, background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}><Leaf size={24}/></div>
-      <div>
-        <div style={{ fontSize:16, fontWeight:800, color:"#4ADE80", fontFamily:"'Space Grotesk',sans-serif", lineHeight:1 }}>AgroAI</div>
-        <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Field Intelligence</div>
-      </div>
-    </div>
-    <div style={{ fontSize:9, color:"#334155", fontWeight:700, letterSpacing:2, padding:"0 10px 8px", textTransform:"uppercase" }}>Navigation</div>
-    {NAV.filter(n => !n.hideInSidebar).map(n => (
-      <button key={n.key} onClick={() => onNav(n.key)} style={{
-        display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
-        borderRadius:10, border:"none", cursor:"pointer",
-        background: active===n.key ? "rgba(74,222,128,0.12)" : "transparent",
-        borderLeft: active===n.key ? "3px solid #4ADE80" : "3px solid transparent",
-        color: active===n.key ? "#4ADE80" : "#64748B",
-        fontSize:13, fontWeight: active===n.key ? 700 : 400,
-        fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", textAlign:"left",
-      }}>
-        <span style={{ fontSize:16, width:22, textAlign:"center" }}>{n.icon}</span>
-        {n.label}
-        {n.key==="stock" && <span style={{ marginLeft:"auto", fontSize:10, background:"rgba(239,68,68,0.2)", color:"#EF4444", borderRadius:5, padding:"2px 6px", fontWeight:700 }}>2</span>}
-      </button>
-    ))}
-    <div style={{ marginTop:"auto", padding:"20px 10px 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}><User size={20}/></div>
+const Sidebar = ({ active, onNav }) => {
+  const { role, setRole } = useUIStore();
+  return (
+    <aside style={{
+      width:240, flexShrink:0, background:"rgba(8,18,12,0.97)",
+      borderRight:"1px solid rgba(255,255,255,0.07)",
+      display:"flex", flexDirection:"column", padding:"28px 16px",
+      gap:4, height:"100vh", position:"sticky", top:0,
+    }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0 8px 28px" }}>
+        <div style={{ width:38, height:38, borderRadius:10, background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}><Leaf size={24}/></div>
         <div>
-          <div style={{ fontSize:13, fontWeight:700, color:"#CBD5E1" }}>Amit Sharma</div>
-          <div style={{ fontSize:10, color:"#475569" }}>Field Representative</div>
+          <div style={{ fontSize:16, fontWeight:800, color:"#4ADE80", fontFamily:"'Space Grotesk',sans-serif", lineHeight:1 }}>AgroAI</div>
+          <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Field Intelligence</div>
         </div>
       </div>
-    </div>
-  </aside>
-);
+      <div style={{ fontSize:9, color:"#334155", fontWeight:700, letterSpacing:2, padding:"0 10px 8px", textTransform:"uppercase" }}>Navigation</div>
+      {NAV.filter(n => !n.hideInSidebar).map(n => (
+        <button key={n.key} onClick={() => onNav(n.key)} style={{
+          display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
+          borderRadius:10, border:"none", cursor:"pointer",
+          background: active===n.key ? "rgba(74,222,128,0.12)" : "transparent",
+          borderLeft: active===n.key ? "3px solid #4ADE80" : "3px solid transparent",
+          color: active===n.key ? "#4ADE80" : "#64748B",
+          fontSize:13, fontWeight: active===n.key ? 700 : 400,
+          fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", textAlign:"left",
+        }}>
+          <span style={{ fontSize:16, width:22, textAlign:"center" }}>{n.icon}</span>
+          {n.label}
+          {n.key==="stock" && <span style={{ marginLeft:"auto", fontSize:10, background:"rgba(239,68,68,0.2)", color:"#EF4444", borderRadius:5, padding:"2px 6px", fontWeight:700 }}>2</span>}
+        </button>
+      ))}
+      <div style={{ marginTop:"auto", padding:"20px 10px 0", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:12 }}>
+        {/* Role Switcher */}
+        <button
+          onClick={() => {
+            setRole('manager');
+            // Force redirect to root path of manager
+            window.location.href = '/';
+          }}
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            borderRadius: 8,
+            border: "1px solid rgba(74, 222, 128, 0.3)",
+            background: "rgba(74, 222, 128, 0.08)",
+            color: "#4ADE80",
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            fontFamily: "'DM Sans',sans-serif",
+            transition: "all 0.2s"
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = "rgba(74, 222, 128, 0.16)";
+            e.currentTarget.style.boxShadow = "0 0 12px rgba(74, 222, 128, 0.15)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = "rgba(74, 222, 128, 0.08)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <span>🔄</span> Switch to District Manager
+        </button>
+
+        {/* User profile card */}
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}><User size={20}/></div>
+          <div>
+            <div style={{ fontSize:13, fontWeight:700, color:"#CBD5E1" }}>Amit Sharma</div>
+            <div style={{ fontSize:10, color:"#475569" }}>Field Representative</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+};
 
 // ─── TOPBAR ───────────────────────────────────────────────────────────────────
 const TopBar = ({ page }) => {
@@ -1361,12 +1404,39 @@ const PlaceholderPage = ({ title }) => (
   </div>
 );
 
-const visitPlannerData = [
-  { id:1, name:"Ganga Agri Kendra", score:94.5, location:"Patna Tahsil, Patna", lastVisit:"36 days ago", stockRisk:"High Stock Risk", revenue:18500, why:["High order probability","Frequent buyer","Stock replenishment needed"] },
-  { id:2, name:"Kisan Seed Store", score:90.5, location:"Patna Tahsil, Patna", lastVisit:"7 days ago", stockRisk:"Critical Stock", revenue:15200, why:["Immediate restocking required","High purchase frequency"] },
-  { id:3, name:"Mahavir Fertilizers", score:76.3, location:"Patna Tahsil, Patna", lastVisit:"12 days ago", stockRisk:"Medium Risk", revenue:8700, why:["Seasonal demand increase","Good conversion chance"] },
-  { id:4, name:"Ram Krishi Bhandar", score:64.3, location:"Patna Tahsil, Patna", lastVisit:"8 days ago", stockRisk:"Low Risk", revenue:5600, why:["Regular buyer","Maintain relationship"] }
-];
+const REGIONAL_VISIT_DATA = {
+  "Patna Region": [
+    { id:1, name:"Ganga Agri Kendra", score:94.5, location:"Patna Tahsil, Patna", lastVisit:"36 days ago", stockRisk:"High Stock Risk", revenue:18500, why:["High order probability","Frequent buyer","Stock replenishment needed"], phone:"+91 94123 45678", x:80, y:60 },
+    { id:2, name:"Kisan Seed Store", score:90.5, location:"Patna Tahsil, Patna", lastVisit:"7 days ago", stockRisk:"Critical Stock", revenue:15200, why:["Immediate restocking required","High purchase frequency"], phone:"+91 94123 45679", x:170, y:50 },
+    { id:3, name:"Patel Agro Agency", score:85.0, location:"Danapur, Patna", lastVisit:"42 days ago", stockRisk:"Critical Stock", revenue:12000, why:["Low stock warning","Overdue payment follow-up"], phone:"+91 94123 45683", x:260, y:70 },
+    { id:4, name:"Mahavir Fertilizers", score:76.3, location:"Patna Tahsil, Patna", lastVisit:"12 days ago", stockRisk:"Medium Risk", revenue:8700, why:["Seasonal demand increase","Good conversion chance"], phone:"+91 94123 45680", x:330, y:110 },
+    { id:5, name:"Bharat Seeds", score:72.1, location:"Phulwari Sharif, Patna", lastVisit:"15 days ago", stockRisk:"High Stock Risk", revenue:9800, why:["Stock depletion warning","New product launch interest"], phone:"+91 94123 45684", x:290, y:170 },
+    { id:6, name:"Ram Krishi Bhandar", score:64.3, location:"Patna Tahsil, Patna", lastVisit:"8 days ago", stockRisk:"Low Risk", revenue:5600, why:["Regular buyer","Maintain relationship"], phone:"+91 94123 45681", x:210, y:200 },
+    { id:7, name:"Choudhary Fertilizers", score:58.4, location:"Fatuha, Patna", lastVisit:"29 days ago", stockRisk:"Low Risk", revenue:4200, why:["Routine check-in","Feedback collection"], phone:"+91 94123 45685", x:120, y:190 },
+    { id:8, name:"Shiv Shakti Pesticides", score:52.0, location:"Danapur, Patna", lastVisit:"5 days ago", stockRisk:"Low Risk", revenue:3100, why:["New retailer onboarded","Catalog delivery"], phone:"+91 94123 45686", x:60, y:120 }
+  ],
+  "Jhansi Region": [
+    { id:1, name:"Bundelkhand Agri Store", score:96.2, location:"Sipri Bazar, Jhansi", lastVisit:"33 days ago", stockRisk:"Critical Stock", revenue:22000, why:["High order probability","Restocking needed"], phone:"+91 94123 45701", x:70, y:50 },
+    { id:2, name:"Jhansi Seed House", score:88.4, location:"Mauranipur, Jhansi", lastVisit:"10 days ago", stockRisk:"High Stock Risk", revenue:16500, why:["Frequent buyer","Payment reminder"], phone:"+91 94123 45702", x:160, y:70 },
+    { id:3, name:"Veer Agro Agency", score:82.1, location:"Gwalior Road, Jhansi", lastVisit:"40 days ago", stockRisk:"Critical Stock", revenue:14000, why:["Low stock warning","No contact > 30 days"], phone:"+91 94123 45703", x:240, y:60 },
+    { id:4, name:"Rani Laxmi Fertilizers", score:78.5, location:"Babina, Jhansi", lastVisit:"14 days ago", stockRisk:"Medium Risk", revenue:9500, why:["Seasonal demand","Bulk discount discussion"], phone:"+91 94123 45704", x:340, y:90 },
+    { id:5, name:"Betwa Seed Corp", score:70.3, location:"Barua Sagar, Jhansi", lastVisit:"18 days ago", stockRisk:"High Stock Risk", revenue:8200, why:["Stock depletion warning"], phone:"+91 94123 45705", x:310, y:180 },
+    { id:6, name:"Bundela Krishi Bhandar", score:65.0, location:"Sipri Bazar, Jhansi", lastVisit:"6 days ago", stockRisk:"Low Risk", revenue:6100, why:["Regular buyer","Feedback"], phone:"+91 94123 45706", x:220, y:190 },
+    { id:7, name:"Orchha Fertilizers", score:56.1, location:"Orchha Gate, Jhansi", lastVisit:"25 days ago", stockRisk:"Low Risk", revenue:4800, why:["Routine visit"], phone:"+91 94123 45707", x:130, y:210 },
+    { id:8, name:"Elite Pesticides", score:50.5, location:"Chitra Chauraha, Jhansi", lastVisit:"4 days ago", stockRisk:"Low Risk", revenue:3500, why:["Catalog update"], phone:"+91 94123 45708", x:60, y:130 }
+  ],
+  "Bhopal Region": [
+    { id:1, name:"Raja Bhoj Agri Tech", score:95.8, location:"Kolar Road, Bhopal", lastVisit:"38 days ago", stockRisk:"Critical Stock", revenue:24000, why:["Restocking required","High purchase frequency"], phone:"+91 94123 45801", x:90, y:70 },
+    { id:2, name:"MP Seeds & Pesticides", score:89.1, location:"MP Nagar, Bhopal", lastVisit:"8 days ago", stockRisk:"High Stock Risk", revenue:17200, why:["High order probability"], phone:"+91 94123 45802", x:180, y:60 },
+    { id:3, name:"Satpura Agro Agency", score:84.5, location:"Bairagarh, Bhopal", lastVisit:"45 days ago", stockRisk:"Critical Stock", revenue:13500, why:["No contact > 40 days","Payment follow-up"], phone:"+91 94123 45803", x:250, y:80 },
+    { id:4, name:"Vindhyachal Fertilizers", score:75.0, location:"Indrapuri, Bhopal", lastVisit:"11 days ago", stockRisk:"Medium Risk", revenue:10200, why:["Seasonal demand"], phone:"+91 94123 45804", x:320, y:100 },
+    { id:5, name:"Narmada Crop Care", score:71.2, location:"Mandideep, Bhopal", lastVisit:"16 days ago", stockRisk:"High Stock Risk", revenue:8900, why:["Stock replenishment"], phone:"+91 94123 45805", x:300, y:160 },
+    { id:6, name:"Malwa Krishi Bhandar", score:63.8, location:"MP Nagar, Bhopal", lastVisit:"9 days ago", stockRisk:"Low Risk", revenue:5800, why:["Routine contact"], phone:"+91 94123 45806", x:230, y:210 },
+    { id:7, name:"Lake City Seeds", score:57.2, location:"Lalghati, Bhopal", lastVisit:"28 days ago", stockRisk:"Low Risk", revenue:4500, why:["Routine check-in"], phone:"+91 94123 45807", x:140, y:180 },
+    { id:8, name:"Capital Fertilizers", score:51.5, location:"Govindpura, Bhopal", lastVisit:"3 days ago", stockRisk:"Low Risk", revenue:2900, why:["Catalog update"], phone:"+91 94123 45808", x:70, y:130 }
+  ]
+};;
+
 
 const riskTrendData = [
   { date:"02 Jun", High:40, Medium:20, Low:30 },
@@ -1699,161 +1769,1073 @@ const AiRecommendationsPage = () => {
 
 // ─── VISIT PLANNER PAGE ───────────────────────────────────────────────────────
 const VisitPlannerPage = () => {
+  const [region, setRegion] = useState("Patna Region");
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false);
+  const [date, setDate] = useState("09 Jun 2026");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [completedVisits, setCompletedVisits] = useState([3, 8]); // Default pre-completed IDs (Mahavir & Shiv Shakti)
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [routeStarted, setRouteStarted] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showFullMapModal, setShowFullMapModal] = useState(false);
+  const [userLoc, setUserLoc] = useState({ x: 200, y: 130 });
+
+  const regionRef = useRef(null);
+  const dateRef = useRef(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (regionRef.current && !regionRef.current.contains(e.target)) {
+        setShowRegionDropdown(false);
+      }
+      if (dateRef.current && !dateRef.current.contains(e.target)) {
+        setShowDateDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const dataset = REGIONAL_VISIT_DATA[region] || REGIONAL_VISIT_DATA["Patna Region"];
+
+  // Helper to show a temporary toast notification
+  const triggerToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Helper to filter data based on tab selection
+  const getFilteredData = (data, filter) => {
+    return data.filter(item => {
+      if (filter === "All") return true;
+      if (filter === "High Priority") return item.score >= 75;
+      if (filter === "High Revenue") return item.revenue >= 9000;
+      if (filter === "Low Stock") return item.stockRisk === "Critical Stock" || item.stockRisk === "High Stock Risk";
+      if (filter === "No Visit > 30 Days") {
+        const days = parseInt(item.lastVisit);
+        return !isNaN(days) && days > 30;
+      }
+      if (filter === "Follow-up") {
+        return item.why.some(w => w.toLowerCase().includes("relationship") || w.toLowerCase().includes("routine") || w.toLowerCase().includes("feedback") || w.toLowerCase().includes("catalog"));
+      }
+      return true;
+    });
+  };
+
+  const filteredVisits = getFilteredData(dataset, activeFilter);
+
+  const nextStopIndex = filteredVisits.findIndex(v => !completedVisits.includes(v.id));
+  const nextStop = nextStopIndex !== -1 ? filteredVisits[nextStopIndex] : null;
+  const lastCompletedVisit = nextStopIndex > 0 
+    ? filteredVisits[nextStopIndex - 1] 
+    : (nextStopIndex === -1 && filteredVisits.length > 0 ? filteredVisits[filteredVisits.length - 1] : null);
+
+  // Dynamically update GPS coordinates based on last completed visit
+  useEffect(() => {
+    let targetLoc = { x: 200, y: 130 };
+    if (routeStarted && lastCompletedVisit) {
+      targetLoc = { x: lastCompletedVisit.x, y: lastCompletedVisit.y };
+    } else if (filteredVisits.length > 0) {
+      targetLoc = { x: filteredVisits[0].x, y: filteredVisits[0].y };
+    }
+
+    // Only update state if the coordinates have actually changed to prevent infinite re-render loops
+    setUserLoc(current => {
+      if (current.x === targetLoc.x && current.y === targetLoc.y) {
+        return current;
+      }
+      return targetLoc;
+    });
+  }, [routeStarted, lastCompletedVisit, filteredVisits]);
+
+  // Calculate stats dynamically
+  const totalRevenue = dataset.reduce((acc, curr) => acc + curr.revenue, 0);
+  const completedRevenue = completedVisits.reduce((acc, id) => {
+    const item = dataset.find(v => v.id === id);
+    return acc + (item ? item.revenue : 0);
+  }, 0);
+  
+  const targetRevenue = Math.round(totalRevenue * 0.62); // ~62% of total potential is target
+  const completedPct = dataset.length > 0 ? Math.round((completedVisits.length / dataset.length) * 100) : 0;
+
+  // Region specific routing stats
+  const routeStats = {
+    "Patna Region": { distance: 156, time: "6h 20m" },
+    "Jhansi Region": { distance: 184, time: "7h 10m" },
+    "Bhopal Region": { distance: 142, time: "5h 45m" }
+  }[region] || { distance: 150, time: "6h 00m" };
+
+  const activeDistance = filteredVisits.length === dataset.length 
+    ? routeStats.distance 
+    : Math.round(routeStats.distance * (filteredVisits.length / dataset.length));
+
+  // Calculate cumulative distances along the route dynamically based on coordinates
+  const getDistance = (p1, p2) => {
+    if (!p1 || !p2) return 0;
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const cumulativeDistances = [];
+  let currentSvgDist = 0;
+  filteredVisits.forEach((v, idx) => {
+    if (idx === 0) {
+      cumulativeDistances.push(0);
+    } else {
+      currentSvgDist += getDistance(filteredVisits[idx - 1], v);
+      cumulativeDistances.push(currentSvgDist);
+    }
+  });
+
+  const totalSvgDist = currentSvgDist || 1;
+  const scale = activeDistance / totalSvgDist;
+  const scaledDistances = cumulativeDistances.map(d => Math.round(d * scale));
+
+  const totalMin = {
+    "Patna Region": 380,
+    "Jhansi Region": 430,
+    "Bhopal Region": 345
+  }[region] || 360;
+  
+  const activeMin = Math.round((totalMin * filteredVisits.length) / dataset.length) || 30;
+  const activeTime = `${Math.floor(activeMin / 60)}h ${activeMin % 60}m`;
+
+  const handleOptimize = () => {
+    setIsOptimizing(true);
+    triggerToast("AI Engine: Recalculating optimized route path...");
+    setTimeout(() => {
+      setIsOptimizing(false);
+      triggerToast("AI Route optimization completed successfully!");
+    }, 1200);
+  };
+  const handleStartRoute = () => {
+    if (routeStarted) {
+      setRouteStarted(false);
+      triggerToast("Route stopped. Progress saved.");
+    } else {
+      setRouteStarted(true);
+      const targetName = nextStop ? nextStop.name : "first destination";
+      triggerToast(`Route started! Head towards ${targetName}.`);
+    }
+  };
+
+  const handleSimulateNextStop = () => {
+    if (!routeStarted) {
+      setRouteStarted(true);
+      const targetName = nextStop ? nextStop.name : "first destination";
+      triggerToast(`Route started! Head towards ${targetName}.`);
+      return;
+    }
+    if (nextStop) {
+      setCompletedVisits(p => [...p, nextStop.id]);
+      triggerToast(`Arrived at ${nextStop.name}! ₹${nextStop.revenue.toLocaleString()} collected.`);
+      if (nextStopIndex === filteredVisits.length - 1) {
+        setTimeout(() => {
+          setRouteStarted(false);
+          triggerToast("Congratulations! All stops on optimized route completed.");
+        }, 1500);
+      }
+    } else {
+      triggerToast("All stops completed! Route finished.");
+      setRouteStarted(false);
+    }
+  };
+
+  const handleToggleVisit = (v) => {
+    if (completedVisits.includes(v.id)) {
+      setCompletedVisits(p => p.filter(id => id !== v.id));
+      triggerToast(`Removed check-in at ${v.name}`);
+    } else {
+      setCompletedVisits(p => [...p, v.id]);
+      triggerToast(`Checked in at ${v.name}! ₹${v.revenue.toLocaleString()} added to progress.`);
+      // Auto complete route if this was the last incomplete stop
+      const remainingIncomplete = filteredVisits.filter(item => !completedVisits.includes(item.id) && item.id !== v.id);
+      if (remainingIncomplete.length === 0 && routeStarted) {
+        setTimeout(() => {
+          setRouteStarted(false);
+          triggerToast("All visits checked-in! Optimized route completed.");
+        }, 1500);
+      }
+    }
+  };
+
+  const filterPills = [
+    { key: "All", label: `All (${dataset.length})` },
+    { key: "High Priority", label: `High Priority (${getFilteredData(dataset, "High Priority").length})` },
+    { key: "High Revenue", label: `High Revenue (${getFilteredData(dataset, "High Revenue").length})` },
+    { key: "Low Stock", label: `Low Stock (${getFilteredData(dataset, "Low Stock").length})` },
+    { key: "No Visit > 30 Days", label: `No Visit > 30 Days (${getFilteredData(dataset, "No Visit > 30 Days").length})` },
+    { key: "Follow-up", label: `Follow-up (${getFilteredData(dataset, "Follow-up").length})` }
+  ];
+
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:10 }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:20, position: "relative" }}>
+      {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: "fixed",
+          top: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(10, 24, 15, 0.95)",
+          border: "1px solid #4ADE80",
+          borderRadius: 10,
+          padding: "12px 24px",
+          color: "#4ADE80",
+          fontSize: 13,
+          fontWeight: 700,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          zIndex: 2000,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          backdropFilter: "blur(8px)",
+          animation: "slideDown 0.3s ease"
+        }}>
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes slideDown {
+              from { transform: translate(-50%, -20px); opacity: 0; }
+              to { transform: translate(-50%, 0); opacity: 1; }
+            }
+            .custom-scroll::-webkit-scrollbar {
+              width: 4px;
+              height: 4px;
+            }
+            .custom-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scroll::-webkit-scrollbar-thumb {
+              background: rgba(74, 222, 128, 0.25);
+              border-radius: 4px;
+            }
+            .custom-scroll::-webkit-scrollbar-thumb:hover {
+              background: rgba(74, 222, 128, 0.45);
+            }
+            @keyframes shimmer {
+              0% { background-position: -200% 0; }
+              100% { background-position: 200% 0; }
+            }
+            .animate-shimmer {
+              animation: shimmer 2s infinite linear;
+            }
+            @keyframes flow {
+              to {
+                stroke-dashoffset: -13;
+              }
+            }
+            .flow-line {
+              animation: flow 1.2s infinite linear;
+            }
+          ` }} />
+          <Leaf size={16} /> {toast}
+        </div>
+      )}
+
+      {/* Selectors Header */}
+      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:4 }}>
         <div style={{ display:"flex", gap:12 }}>
-          <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8 }}><span><MapPin size={14}/></span> Patna Region ▾</div>
-          <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8 }}><span><Calendar size={14}/></span> 09 Jun 2026 ▾</div>
+          {/* Region Selector */}
+          <div ref={regionRef} style={{ position: "relative" }}>
+            <button 
+              onClick={() => setShowRegionDropdown(!showRegionDropdown)}
+              style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8, cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+            >
+              <MapPin size={14}/> {region} ▾
+            </button>
+            {showRegionDropdown && (
+              <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, background: "rgba(10,24,15,0.98)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, zIndex: 100, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 10px 30px rgba(0,0,0,0.8)" }}>
+                {["Patna Region", "Jhansi Region", "Bhopal Region"].map(r => (
+                  <div key={r} 
+                    onClick={() => { setRegion(r); setCompletedVisits([]); setRouteStarted(false); setIsExpanded(false); setShowRegionDropdown(false); triggerToast(`Switched view to ${r}`); }}
+                    style={{ padding: "10px 18px", color: region === r ? "#4ADE80" : "#CBD5E1", background: region === r ? "rgba(74,222,128,0.08)" : "transparent", cursor: "pointer", transition: "all 0.15s", fontSize: 12, whiteSpace: "nowrap", fontWeight: region === r ? 700 : 400 }}
+                    onMouseEnter={e => { if (region !== r) e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
+                    onMouseLeave={e => { if (region !== r) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    {r}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Date Selector */}
+          <div ref={dateRef} style={{ position: "relative" }}>
+            <button 
+              onClick={() => setShowDateDropdown(!showDateDropdown)}
+              style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"8px 16px", color:"#F8FAFC", fontSize:13, display:"flex", alignItems:"center", gap:8, cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+            >
+              <Calendar size={14}/> {date} ▾
+            </button>
+            {showDateDropdown && (
+              <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, background: "rgba(10,24,15,0.98)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, zIndex: 100, overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 10px 30px rgba(0,0,0,0.8)" }}>
+                {["09 Jun 2026", "10 Jun 2026", "11 Jun 2026"].map(d => (
+                  <div key={d} 
+                    onClick={() => { setDate(d); setCompletedVisits([]); setRouteStarted(false); setIsExpanded(false); setShowDateDropdown(false); triggerToast(`Date set to ${d}`); }}
+                    style={{ padding: "10px 18px", color: date === d ? "#4ADE80" : "#CBD5E1", background: date === d ? "rgba(74,222,128,0.08)" : "transparent", cursor: "pointer", transition: "all 0.15s", fontSize: 12, whiteSpace: "nowrap", fontWeight: date === d ? 700 : 400 }}
+                    onMouseEnter={e => { if (date !== d) e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
+                    onMouseLeave={e => { if (date !== d) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    {d}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
+      {/* KPI Panel */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr) auto", gap:14 }}>
-        <div style={{ background:"rgba(74,222,128,0.05)", border:"1px solid rgba(74,222,128,0.1)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ fontSize:24 }}><Users size={24}/></div>
-          <div><div style={{ fontSize:11, color:"#94A3B8" }}>Visits Planned</div><div style={{ fontSize:22, fontWeight:800, color:"#F8FAFC" }}>8 <span style={{fontSize:12, fontWeight:400, color:"#64748B"}}>Today</span></div></div>
+        <div style={{ background:"rgba(74,222,128,0.03)", border:"1px solid rgba(74,222,128,0.08)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
+          <div style={{ fontSize:22, color: "#4ADE80" }}><Users size={22}/></div>
+          <div><div style={{ fontSize:10, color:"#94A3B8", textTransform:"uppercase", fontWeight:700, letterSpacing:0.5 }}>Visits Planned</div><div style={{ fontSize:20, fontWeight:800, color:"#F8FAFC", marginTop:2 }}>{dataset.length} <span style={{fontSize:11, fontWeight:400, color:"#64748B"}}>Today</span></div></div>
         </div>
-        <div style={{ background:"rgba(74,222,128,0.05)", border:"1px solid rgba(74,222,128,0.1)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ fontSize:24 }}><IndianRupee size={24}/></div>
-          <div><div style={{ fontSize:11, color:"#94A3B8" }}>Revenue Potential</div><div style={{ fontSize:22, fontWeight:800, color:"#F8FAFC" }}>₹48,000 <span style={{fontSize:12, fontWeight:400, color:"#64748B"}}>Today</span></div></div>
+        <div style={{ background:"rgba(74,222,128,0.03)", border:"1px solid rgba(74,222,128,0.08)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
+          <div style={{ fontSize:22, color: "#4ADE80" }}><IndianRupee size={22}/></div>
+          <div><div style={{ fontSize:10, color:"#94A3B8", textTransform:"uppercase", fontWeight:700, letterSpacing:0.5 }}>Revenue Potential</div><div style={{ fontSize:20, fontWeight:800, color:"#4ADE80", marginTop:2 }}>₹{totalRevenue.toLocaleString()} <span style={{fontSize:11, fontWeight:400, color:"#64748B"}}>Today</span></div></div>
         </div>
-        <div style={{ background:"rgba(74,222,128,0.05)", border:"1px solid rgba(74,222,128,0.1)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ fontSize:24 }}><CornerDownRight size={24}/></div>
-          <div><div style={{ fontSize:11, color:"#94A3B8" }}>Total Distance</div><div style={{ fontSize:22, fontWeight:800, color:"#F8FAFC" }}>156 km <span style={{fontSize:12, fontWeight:400, color:"#64748B"}}>Optimized</span></div></div>
+        <div style={{ background:"rgba(74,222,128,0.03)", border:"1px solid rgba(74,222,128,0.08)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
+          <div style={{ fontSize:22, color: "#4ADE80" }}><CornerDownRight size={22}/></div>
+          <div><div style={{ fontSize:10, color:"#94A3B8", textTransform:"uppercase", fontWeight:700, letterSpacing:0.5 }}>Total Distance</div><div style={{ fontSize:20, fontWeight:800, color:"#F8FAFC", marginTop:2 }}>{activeDistance} km <span style={{fontSize:11, fontWeight:400, color:"#64748B"}}>Optimized</span></div></div>
         </div>
-        <div style={{ background:"rgba(74,222,128,0.05)", border:"1px solid rgba(74,222,128,0.1)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ fontSize:24 }}><Clock size={24}/></div>
-          <div><div style={{ fontSize:11, color:"#94A3B8" }}>Estimated Time</div><div style={{ fontSize:22, fontWeight:800, color:"#F8FAFC" }}>6h 20m <span style={{fontSize:12, fontWeight:400, color:"#64748B"}}>On the road</span></div></div>
+        <div style={{ background:"rgba(74,222,128,0.03)", border:"1px solid rgba(74,222,128,0.08)", borderRadius:12, padding:"16px", display:"flex", alignItems:"center", gap:16 }}>
+          <div style={{ fontSize:22, color: "#4ADE80" }}><Clock size={22}/></div>
+          <div><div style={{ fontSize:10, color:"#94A3B8", textTransform:"uppercase", fontWeight:700, letterSpacing:0.5 }}>Estimated Time</div><div style={{ fontSize:20, fontWeight:800, color:"#F8FAFC", marginTop:2 }}>{activeTime} <span style={{fontSize:11, fontWeight:400, color:"#64748B"}}>On the road</span></div></div>
         </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          <button style={{ background:"#16A34A", color:"#fff", border:"none", borderRadius:8, padding:"10px 24px", fontSize:14, fontWeight:700, cursor:"pointer", flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><Play size={16} /> Start Route</button>
-          <button style={{ background:"rgba(255,255,255,0.05)", color:"#F8FAFC", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"10px 24px", fontSize:14, fontWeight:600, cursor:"pointer", flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><RefreshCw size={16} /> Optimize Again</button>
+        <div style={{ display:"flex", flexDirection:"column", gap:8, width: 170 }}>
+          <button 
+            onClick={handleStartRoute}
+            style={{ 
+              background: routeStarted ? "rgba(239,68,68,0.15)" : "#16A34A", 
+              color: routeStarted ? "#EF4444" : "#fff", 
+              border: routeStarted ? "1px solid rgba(239,68,68,0.3)" : "none", 
+              borderRadius:8, padding:"10px 16px", fontSize:13, fontWeight:700, cursor:"pointer", flex:1, 
+              display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition: "all 0.2s" 
+            }}
+            onMouseEnter={e => { if(!routeStarted) e.currentTarget.style.background = "#15803d"; }}
+            onMouseLeave={e => { if(!routeStarted) e.currentTarget.style.background = "#16A34A"; }}
+          >
+            {routeStarted ? <div style={{ width:8, height:8, borderRadius:"50%", background:"#EF4444", animation:"ping 1.2s infinite" }}></div> : <Play size={14} />} 
+            {routeStarted ? "On the Road" : "Start Route"}
+          </button>
+          {routeStarted ? (
+            <button 
+              onClick={handleSimulateNextStop}
+              style={{ 
+                background: "rgba(59,130,246,0.15)", 
+                color: "#60A5FA", 
+                border: "1px solid rgba(59,130,246,0.4)", 
+                borderRadius:8, padding:"10px 16px", fontSize:12, fontWeight:700, cursor:"pointer", flex:1, 
+                display:"flex", alignItems:"center", justifyContent:"center", gap:6, transition: "all 0.15s",
+                boxShadow: "0 0 10px rgba(59,130,246,0.15)"
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(59,130,246,0.25)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(59,130,246,0.15)"}
+            >
+              🚀 Simulate Next
+            </button>
+          ) : (
+            <button 
+              onClick={handleOptimize}
+              style={{ 
+                background:"rgba(255,255,255,0.04)", color:"#F8FAFC", 
+                border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, 
+                padding:"10px 16px", fontSize:13, fontWeight:600, cursor:"pointer", flex:1, 
+                display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition: "all 0.15s" 
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"; e.currentTarget.style.background = "rgba(74,222,128,0.05)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+            >
+              <RefreshCw size={14} /> Optimize Again
+            </button>
+          )}
         </div>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1.8fr 1.2fr", gap:20 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1.85fr 1.15fr", gap:20 }}>
+        {/* Left Column: Filter Pills + List */}
         <div>
-          <div style={{ display:"flex", gap:10, marginBottom:16, flexWrap:"wrap" }}>
-            {["All (8)","High Priority (4)","High Revenue","Low Stock","No Visit > 30 Days","Follow-up"].map((f,i)=>(
-              <div key={f} style={{ background: i===0?"#16A34A":"rgba(255,255,255,0.05)", color: i===0?"#fff":"#CBD5E1", border:`1px solid ${i===0?"#16A34A":"rgba(255,255,255,0.1)"}`, borderRadius:20, padding:"6px 14px", fontSize:12, fontWeight:600, cursor:"pointer" }}>{f}</div>
-            ))}
+          {/* Filters */}
+          <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
+            {filterPills.map((pill) => {
+              const isActive = activeFilter === pill.key;
+              return (
+                <button 
+                  key={pill.key} 
+                  onClick={() => setActiveFilter(pill.key)} 
+                  style={{ 
+                    background: isActive ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.03)", 
+                    color: isActive ? "#4ADE80" : "#CBD5E1", 
+                    border: `1px solid ${isActive ? "#4ADE80" : "rgba(255,255,255,0.08)"}`, 
+                    borderRadius:20, padding:"6px 14px", fontSize:11, fontWeight:600, cursor:"pointer", transition:"all 0.15s",
+                    display: "flex", alignItems: "center", gap: 5
+                  }}
+                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}
+                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                >
+                  {isActive && "✓"} {pill.label}
+                </button>
+              );
+            })}
           </div>
 
+          {/* Visit Cards List */}
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-            {visitPlannerData.map((v, i) => (
-              <Card key={v.id} style={{ padding:"16px", display:"flex", gap:16, alignItems:"center", background: i===0||i===1?"rgba(74,222,128,0.03)":"rgba(255,255,255,0.02)", borderColor: i===0||i===1?"rgba(74,222,128,0.2)":"rgba(255,255,255,0.07)" }}>
-                <div style={{ width:70, height:70, borderRadius:"50%", border:`4px solid ${v.score>90?"#4ADE80":v.score>70?"#EAB308":"#F97316"}`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <span style={{ fontSize:20, fontWeight:800, color:"#F8FAFC", lineHeight:1 }}>{v.score}</span>
-                  <span style={{ fontSize:9, color:"#94A3B8" }}>AI Score</span>
-                </div>
-                
-                <div style={{ flex:1.2 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ background:"#4ADE80", color:"#0F1F14", fontSize:10, fontWeight:800, padding:"2px 6px", borderRadius:4 }}>{i+1}</span>
-                    <span style={{ fontSize:16, fontWeight:700, color:"#F8FAFC" }}>{v.name}</span>
-                  </div>
-                  <div style={{ fontSize:12, color:"#94A3B8", marginTop:4, display:"flex", alignItems:"center", gap:4 }}><MapPin size={12} style={{marginRight:4}}/> {v.location}</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:10 }}>
-                    <div style={{ fontSize:11, color:"#64748B" }}>Last Visit: {v.lastVisit}</div>
-                    <div style={{ fontSize:10, padding:"2px 6px", borderRadius:4, background: v.stockRisk.includes("Critical")?"rgba(239,68,68,0.15)":v.stockRisk.includes("High")?"rgba(249,115,22,0.15)":v.stockRisk.includes("Medium")?"rgba(234,179,8,0.15)":"rgba(74,222,128,0.15)", color: v.stockRisk.includes("Critical")?"#EF4444":v.stockRisk.includes("High")?"#F97316":v.stockRisk.includes("Medium")?"#EAB308":"#4ADE80", fontWeight:600 }}>{v.stockRisk}</div>
-                  </div>
-                </div>
+            {isOptimizing ? (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:300, background:"rgba(255,255,255,0.02)", borderRadius:16, border:"1px solid rgba(255,255,255,0.05)", gap:14 }}>
+                <div style={{ width:36, height:36, borderRadius:"50%", border:"3px solid rgba(74,222,128,0.1)", borderTopColor:"#4ADE80", animation:"spin 1s linear infinite" }}></div>
+                <style dangerouslySetInnerHTML={{ __html: `
+                  @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                  }
+                  @keyframes ping {
+                    0% { transform: scale(0.8); opacity: 0.5; }
+                    80%, 100% { transform: scale(1.6); opacity: 0; }
+                  }
+                  @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                  }
+                ` }} />
+                <div style={{ color:"#CBD5E1", fontSize:14, fontWeight:600 }}>AI Route Optimization in progress...</div>
+                <div style={{ color:"#64748B", fontSize:11 }}>Calculating shortest path using Sales-Revenue density</div>
+              </div>
+            ) : filteredVisits.length === 0 ? (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:200, background:"rgba(255,255,255,0.01)", borderRadius:16, border:"1px solid rgba(255,255,255,0.05)", color: "#64748B", fontSize:13 }}>
+                No visits found matching the selected filter.
+              </div>
+            ) : (
+              <>
+                {filteredVisits.slice(0, isExpanded ? undefined : 4).map((v, i) => {
+                  const isCompleted = completedVisits.includes(v.id);
+                  const isNext = routeStarted && nextStop && nextStop.id === v.id;
+                  return (
+                    <Card 
+                      key={v.id} 
+                      style={{ 
+                        padding:"16px", display:"flex", gap:16, alignItems:"center", 
+                        background: isCompleted 
+                          ? "rgba(255,255,255,0.01)" 
+                          : isNext 
+                            ? "rgba(59,130,246,0.03)" 
+                            : i===0||i===1 
+                              ? "rgba(74,222,128,0.03)" 
+                              : "rgba(255,255,255,0.02)", 
+                        borderColor: isCompleted 
+                          ? "rgba(255,255,255,0.04)" 
+                          : isNext 
+                            ? "#3B82F6" 
+                            : i===0||i===1 
+                              ? "rgba(74,222,128,0.2)" 
+                              : "rgba(255,255,255,0.07)",
+                        boxShadow: isNext ? "0 0 15px rgba(59,130,246,0.15)" : "none",
+                        opacity: isCompleted ? 0.65 : 1,
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      <div style={{ 
+                        width:62, height:62, borderRadius:"50%", 
+                        border:`3.5px solid ${isCompleted ? "#64748B" : isNext ? "#3B82F6" : v.score>90?"#4ADE80":v.score>70?"#EAB308":"#F97316"}`, 
+                        display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flexShrink:0 
+                      }}>
+                        <span style={{ fontSize:18, fontWeight:800, color:"#F8FAFC", lineHeight:1 }}>{v.score}</span>
+                        <span style={{ fontSize:8, color:"#94A3B8" }}>AI Score</span>
+                      </div>
+                      
+                      <div style={{ flex:1.2 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+                          <span style={{ background: isCompleted ? "#475569" : isNext ? "#2563EB" : "#4ADE80", color: isCompleted ? "#CBD5E1" : "#fff", fontSize:10, fontWeight:800, padding:"2px 6px", borderRadius:4 }}>{i+1}</span>
+                          <span style={{ fontSize:15, fontWeight:700, color:"#F8FAFC", textDecoration: isCompleted ? "line-through" : "none" }}>{v.name}</span>
+                          {isNext && (
+                            <span style={{ background:"rgba(59,130,246,0.15)", border:"1px solid rgba(59,130,246,0.3)", color:"#60A5FA", fontSize:8, fontWeight:800, padding:"2px 8px", borderRadius:4, animation:"pulse 1.5s infinite" }}>
+                              NEXT STOP
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize:12, color:"#94A3B8", marginTop:4, display:"flex", alignItems:"center", gap:4 }}><MapPin size={11}/> {v.location}</div>
+                        <div style={{ display:"flex", alignItems:"center", gap:10, marginTop:10 }}>
+                          <div style={{ fontSize:11, color:"#64748B" }}>Last Visit: {v.lastVisit}</div>
+                          <div style={{ fontSize:9, padding:"2px 6px", borderRadius:4, background: v.stockRisk.includes("Critical")?"rgba(239,68,68,0.15)":v.stockRisk.includes("High")?"rgba(249,115,22,0.15)":v.stockRisk.includes("Medium")?"rgba(234,179,8,0.15)":"rgba(74,222,128,0.15)", color: v.stockRisk.includes("Critical")?"#EF4444":v.stockRisk.includes("High")?"#F97316":v.stockRisk.includes("Medium")?"#EAB308":"#4ADE80", fontWeight:600 }}>{v.stockRisk}</div>
+                        </div>
+                      </div>
 
-                <div style={{ flex:1, borderLeft:"1px solid rgba(255,255,255,0.1)", paddingLeft:16 }}>
-                  <div style={{ fontSize:11, color:"#94A3B8" }}>Revenue</div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#4ADE80", marginTop:2 }}>₹{v.revenue.toLocaleString()}</div>
-                </div>
+                      <div style={{ flex:0.9, borderLeft:"1px solid rgba(255,255,255,0.06)", paddingLeft:14 }}>
+                        <div style={{ fontSize:11, color:"#94A3B8" }}>Revenue</div>
+                        <div style={{ fontSize:15, fontWeight:700, color: isCompleted ? "#94A3B8" : isNext ? "#60A5FA" : "#4ADE80", marginTop:2 }}>₹{v.revenue.toLocaleString()}</div>
+                      </div>
 
-                <div style={{ flex:1.5, borderLeft:"1px solid rgba(255,255,255,0.1)", paddingLeft:16 }}>
-                  <div style={{ fontSize:11, color:"#94A3B8", marginBottom:4 }}>Why Visit?</div>
-                  {v.why.map(w=><div key={w} style={{ fontSize:11, color:"#CBD5E1", display:"flex", alignItems:"flex-start", gap:6, marginBottom:2 }}><span style={{color:"#4ADE80"}}>•</span> {w}</div>)}
-                </div>
+                      <div style={{ flex:1.4, borderLeft:"1px solid rgba(255,255,255,0.06)", paddingLeft:14 }}>
+                        <div style={{ fontSize:11, color:"#94A3B8", marginBottom:4 }}>Why Visit?</div>
+                        {v.why.map(w=><div key={w} style={{ fontSize:11, color:"#CBD5E1", display:"flex", alignItems:"flex-start", gap:4, marginBottom:2 }}><span style={{color: isCompleted ? "#64748B" : isNext ? "#60A5FA" : "#4ADE80"}}>•</span> {w}</div>)}
+                      </div>
 
-                <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"flex-end" }}>
-                  <button style={{ background:"rgba(74,222,128,0.15)", border:"1px solid rgba(74,222,128,0.3)", borderRadius:6, padding:"6px 12px", color:"#4ADE80", fontSize:12, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}><Calendar size={14} style={{marginRight:4}}/> Plan Visit <span style={{fontSize:10}}>⋮</span></button>
-                  <div style={{ display:"flex", gap:6 }}>
-                    {["📞","💬","↗️"].map(icon=><button key={icon} style={{ width:28, height:28, borderRadius:6, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", color:"#F8FAFC", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>{icon}</button>)}
-                  </div>
-                </div>
-              </Card>
-            ))}
-            <div style={{ textAlign:"center", fontSize:13, color:"#4ADE80", marginTop:10, cursor:"pointer" }}>View all 8 visits ▾</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"flex-end" }}>
+                        <button 
+                          onClick={() => handleToggleVisit(v)}
+                          style={{ 
+                            background: isCompleted ? "rgba(74,222,128,0.12)" : isNext ? "rgba(59,130,246,0.1)" : "rgba(255,255,255,0.04)", 
+                            border: `1px solid ${isCompleted ? "#4ADE80" : isNext ? "#3B82F6" : "rgba(255,255,255,0.08)"}`, 
+                            borderRadius:6, padding:"6px 12px", 
+                            color: isCompleted ? "#4ADE80" : isNext ? "#60A5FA" : "#CBD5E1", 
+                            fontSize:11, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:6,
+                            transition: "all 0.15s"
+                          }}
+                          onMouseEnter={e => { if(!isCompleted) e.currentTarget.style.borderColor = isNext ? "#60A5FA" : "#4ADE80"; }}
+                          onMouseLeave={e => { if(!isCompleted) e.currentTarget.style.borderColor = isNext ? "#3B82F6" : "rgba(255,255,255,0.08)"; }}
+                        >
+                          {isCompleted ? "✓ Visited" : isNext ? "Arrived?" : "Check-in"} <span style={{fontSize:9}}>⋮</span>
+                        </button>
+                        <div style={{ display:"flex", gap:6 }}>
+                          {/* Interactive Action Buttons */}
+                          <button 
+                            onClick={() => window.open(`tel:${v.phone}`)}
+                            style={{ width:26, height:26, borderRadius:6, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#F8FAFC", fontSize:11, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.15s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.1)"; e.currentTarget.style.borderColor = "#4ADE80"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                            title="Call Store"
+                          >
+                            📞
+                          </button>
+                          <button 
+                            onClick={() => window.open(`https://wa.me/${v.phone.replace(/[^0-9]/g, "")}`)}
+                            style={{ width:26, height:26, borderRadius:6, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#F8FAFC", fontSize:11, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.15s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.1)"; e.currentTarget.style.borderColor = "#4ADE80"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                            title="Send WhatsApp Message"
+                          >
+                            💬
+                          </button>
+                          <button 
+                            onClick={() => triggerToast(`Directions to ${v.name} loaded in navigation.`)}
+                            style={{ width:26, height:26, borderRadius:6, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#F8FAFC", fontSize:11, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.15s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.1)"; e.currentTarget.style.borderColor = "#4ADE80"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                            title="Get Directions"
+                          >
+                            ↗️
+                          </button>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+                {filteredVisits.length > 4 && (
+                  <button 
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    style={{ 
+                      background:"rgba(255,255,255,0.03)", color:"#4ADE80", 
+                      border:"1px solid rgba(74,222,128,0.15)", borderRadius:8, 
+                      padding:"10px 16px", fontSize:12, fontWeight:700, cursor:"pointer",
+                      display:"flex", alignItems:"center", justifyContent:"center", gap:6, transition:"all 0.15s",
+                      width: "100%", marginTop: 4
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(74,222,128,0.08)"; e.currentTarget.style.borderColor = "#4ADE80"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(74,222,128,0.15)"; }}
+                  >
+                    {isExpanded ? "Show Less ▴" : `View all ${filteredVisits.length} visits ▾`}
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </div>
 
+        {/* Right Column: Optimized Route Map & Today's Progress */}
         <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+          {/* Optimized Route Card */}
           <Card style={{ padding:0, overflow:"hidden", display:"flex", flexDirection:"column" }}>
             <div style={{ padding:"16px", borderBottom:"1px solid rgba(255,255,255,0.05)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div style={{ fontSize:14, fontWeight:700, color:"#F8FAFC", display:"flex", alignItems:"center", gap:8 }}><span><Map size={16}/></span> Optimized Route</div>
-              <div style={{ fontSize:12, color:"#4ADE80", cursor:"pointer" }}>View Full Map ▾</div>
+              <div onClick={() => setShowFullMapModal(true)} style={{ fontSize:12, color:"#4ADE80", cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>View Full Map ↗</div>
             </div>
             <div style={{ height:250, background:"#0A1A0F", position:"relative", overflow:"hidden" }}>
               {/* Fake Map Background */}
               <div style={{ position:"absolute", inset:0, opacity:0.3, backgroundImage:"radial-gradient(circle at 50% 50%, #16A34A 1px, transparent 1px)", backgroundSize:"20px 20px" }}></div>
               <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
                 <svg width="100%" height="100%" viewBox="0 0 400 250">
-                  <path d="M 100,120 L 150,80 L 250,50 L 320,100 L 300,180 L 200,200 Z" fill="none" stroke="#4ADE80" strokeWidth="2" strokeDasharray="4 4" />
-                  {[
-                    {x:100,y:120,n:1},{x:150,y:80,n:2},{x:250,y:50,n:3},{x:320,y:100,n:5},{x:300,y:180,n:8},{x:200,y:200,n:4}
-                  ].map(pt => (
-                    <g key={pt.n}>
-                      <circle cx={pt.x} cy={pt.y} r="10" fill="#16A34A" stroke="#0D1F12" strokeWidth="2" />
-                      <text x={pt.x} y={pt.y+4} fontSize="10" fill="#fff" textAnchor="middle" fontWeight="bold">{pt.n}</text>
-                    </g>
-                  ))}
-                  <circle cx="200" cy="130" r="8" fill="#3B82F6" stroke="#fff" strokeWidth="2" />
+                  {/* Dynamic Route Line Path */}
+                  {filteredVisits.length > 1 && (
+                    <path 
+                      d={filteredVisits.map((v, idx) => `${idx === 0 ? "M" : "L"} ${v.x},${v.y}`).join(" ")} 
+                      fill="none" 
+                      stroke="#4ADE80" 
+                      strokeWidth="2" 
+                      strokeDasharray="8 5" 
+                      className="flow-line"
+                      style={{ transition: "all 0.5s ease" }}
+                    />
+                  )}
+                  {/* Dynamic Nodes */}
+                  {filteredVisits.map((pt, idx) => {
+                    const isPtCompleted = completedVisits.includes(pt.id);
+                    const isNext = routeStarted && nextStop && nextStop.id === pt.id;
+                    return (
+                      <g key={pt.id} style={{ cursor: "pointer" }} onClick={() => handleToggleVisit(pt)}>
+                        {/* Outer Pulse ring for Next Stop */}
+                        {isNext && (
+                          <circle 
+                            cx={pt.x} 
+                            cy={pt.y} 
+                            r="17" 
+                            fill="none" 
+                            stroke="#3B82F6" 
+                            strokeWidth="2" 
+                            style={{ opacity: 0.6, animation: "ping 1.5s infinite", transformBox: "fill-box", transformOrigin: "center" }} 
+                          />
+                        )}
+                        <circle 
+                          cx={pt.x} 
+                          cy={pt.y} 
+                          r={isNext ? "13" : "11"} 
+                          fill={isPtCompleted ? "#16A34A" : isNext ? "#2563EB" : "rgba(15,31,20,0.95)"} 
+                          stroke={isPtCompleted ? "rgba(74,222,128,0.4)" : isNext ? "#3B82F6" : pt.score > 90 ? "#4ADE80" : pt.score > 70 ? "#EAB308" : "#F97316"} 
+                          strokeWidth={isPtCompleted ? 4 : isNext ? 3 : 2} 
+                          style={{ transition:"all 0.3s ease" }}
+                        />
+                        <text x={pt.x} y={pt.y+3.5} fontSize="9" fill={isPtCompleted ? "#fff" : isNext ? "#fff" : "#CBD5E1"} textAnchor="middle" fontWeight="bold">
+                          {isPtCompleted ? "✓" : idx + 1}
+                        </text>
+                      </g>
+                    );
+                  })}
+                  {/* Current User GPS Location Dot */}
+                  <circle 
+                    cx={userLoc.x} 
+                    cy={userLoc.y} 
+                    r="12" 
+                    fill="rgba(59, 130, 246, 0.2)" 
+                    stroke="none" 
+                    style={{ transition: "cx 0.8s ease-in-out, cy 0.8s ease-in-out" }} 
+                  />
+                  <circle 
+                    cx={userLoc.x} 
+                    cy={userLoc.y} 
+                    r="6" 
+                    fill="#3B82F6" 
+                    stroke="#fff" 
+                    strokeWidth="1.5" 
+                    style={{ transition: "cx 0.8s ease-in-out, cy 0.8s ease-in-out" }} 
+                  />
                 </svg>
               </div>
             </div>
-            <div style={{ padding:"16px", display:"flex", flexDirection:"column", gap:10 }}>
-              {[
-                { n:1, t:"Ganga Agri Kendra", d:"0 km" },
-                { n:2, t:"Kisan Seed Store", d:"8 km" },
-                { n:3, t:"Mahavir Fertilizers", d:"12 km" },
-                { n:4, t:"Ram Krishi Bhandar", d:"5 km" }
-              ].map(item=>(
-                <div key={item.n} style={{ display:"flex", justifyContent:"space-between", fontSize:12 }}>
-                  <div style={{ display:"flex", gap:10, color:"#CBD5E1" }}><span style={{ color:"#4ADE80" }}>{item.n}</span> {item.t}</div>
-                  <div style={{ color:"#64748B" }}>{item.d}</div>
-                </div>
-              ))}
+            
+            {/* Store Listing under map */}
+            <div style={{ padding:"16px", display:"flex", flexDirection:"column", gap:10, borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+              <div className="custom-scroll" style={{ display:"flex", flexDirection:"column", gap:10, maxHeight:180, overflowY:"auto", paddingRight:6 }}>
+                {filteredVisits.map((item, idx) => {
+                  const isItemCompleted = completedVisits.includes(item.id);
+                  const isNext = routeStarted && nextStop && nextStop.id === item.id;
+                  const itemDist = scaledDistances[idx] !== undefined ? scaledDistances[idx] : 0;
+                  return (
+                    <div key={item.id} style={{ display:"flex", justifyContent:"space-between", fontSize:12, opacity: isItemCompleted ? 0.5 : 1, transition:"opacity 0.2s", background: isNext ? "rgba(59,130,246,0.05)" : "transparent", padding: isNext ? "4px 8px" : "0px", borderRadius: 4, border: isNext ? "1px solid rgba(59,130,246,0.2)" : "none" }}>
+                      <div style={{ display:"flex", gap:10, color: isNext ? "#3B82F6" : isItemCompleted ? "#64748B" : "#CBD5E1", textDecoration: isItemCompleted ? "line-through" : "none", fontWeight: isNext ? 700 : 400, minWidth: 0 }}>
+                        <span style={{ color: isItemCompleted ? "#4ADE80" : isNext ? "#3B82F6" : "#64748B", fontWeight:700 }}>{isItemCompleted ? "✓" : idx + 1}</span> 
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.name}>{item.name}</span>
+                        {isNext && <span style={{ fontSize:9, background:"#3B82F6", color:"#fff", padding:"1px 4px", borderRadius:3, marginLeft:4, fontWeight:800, flexShrink:0 }}>NEXT</span>}
+                      </div>
+                      <div style={{ color: isNext ? "#3B82F6" : "#64748B", flexShrink: 0, marginLeft: 8 }}>{itemDist} km</div>
+                    </div>
+                  );
+                })}
+              </div>
               <div style={{ display:"flex", justifyContent:"space-between", fontSize:13, fontWeight:700, color:"#F8FAFC", borderTop:"1px solid rgba(255,255,255,0.05)", paddingTop:10, marginTop:4 }}>
                 <div>Total Distance</div>
-                <div style={{ color:"#4ADE80" }}>156 km</div>
+                <div style={{ color:"#4ADE80" }}>{activeDistance} km</div>
               </div>
             </div>
           </Card>
 
-          <Card>
-            <div style={{ fontSize:14, fontWeight:700, color:"#F8FAFC", marginBottom:16 }}>Today's Progress</div>
-            <div style={{ display:"flex", alignItems:"center", gap:20 }}>
-              <div style={{ width:70, height:70, borderRadius:"50%", border:"5px solid rgba(74,222,128,0.2)", position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <svg style={{ position:"absolute", top:-5, left:-5, width:80, height:80 }} viewBox="0 0 80 80">
-                  <circle cx="40" cy="40" r="35" fill="none" stroke="#4ADE80" strokeWidth="5" strokeDasharray="220" strokeDashoffset="136" strokeLinecap="round" transform="rotate(-90 40 40)" />
-                </svg>
-                <div style={{ fontSize:18, fontWeight:800, color:"#F8FAFC" }}>38%</div>
+          {/* Today's Progress Card */}
+          <Card style={{ background: "rgba(10, 25, 15, 0.6)", border: "1px solid rgba(74, 222, 128, 0.15)", backdropFilter: "blur(12px)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Activity size={16} color="#4ADE80" style={{ animation: routeStarted ? "pulse 2s infinite" : "none" }} />
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#F8FAFC" }}>Today's Performance</span>
               </div>
-              <div style={{ flex:1, display:"flex", justifyContent:"space-between" }}>
-                <div>
-                  <div style={{ fontSize:11, color:"#94A3B8" }}>Visits Completed</div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#F8FAFC", marginTop:4 }}>3 / 8</div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#4ADE80", background: "rgba(74, 222, 128, 0.1)", padding: "3px 8px", borderRadius: 6, border: "1px solid rgba(74,222,128,0.2)" }}>
+                {completedPct}% Completed
+              </span>
+            </div>
+
+            {/* 3-Column Metrics Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
+              {/* Visits Metric */}
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94A3B8" }}>
+                  <Users size={12} color="#60A5FA" />
+                  <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Visits</span>
                 </div>
-                <div>
-                  <div style={{ fontSize:11, color:"#94A3B8" }}>Orders Generated</div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#F8FAFC", marginTop:4 }}>₹12,400</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#F8FAFC" }}>
+                  {completedVisits.length} <span style={{ fontSize: 11, color: "#64748B", fontWeight: 400 }}>/ {dataset.length}</span>
                 </div>
-                <div>
-                  <div style={{ fontSize:11, color:"#94A3B8" }}>Revenue Target</div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#F8FAFC", marginTop:4 }}>₹48,000</div>
+              </div>
+
+              {/* Revenue Metric */}
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94A3B8" }}>
+                  <IndianRupee size={12} color="#4ADE80" />
+                  <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Revenue</span>
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#4ADE80" }}>
+                  ₹{completedRevenue.toLocaleString()}
+                </div>
+              </div>
+
+              {/* Target Metric */}
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94A3B8" }}>
+                  <Target size={12} color="#EAB308" />
+                  <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Target</span>
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#F8FAFC" }}>
+                  ₹{targetRevenue.toLocaleString()}
                 </div>
               </div>
             </div>
-            <div style={{ height:6, background:"rgba(255,255,255,0.1)", borderRadius:3, marginTop:20 }}>
-              <div style={{ width:"38%", height:"100%", background:"#4ADE80", borderRadius:3 }}></div>
+
+            {/* Glowing Shimmer Progress Bar */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#94A3B8", fontWeight: 600 }}>
+                <span>Route Progress</span>
+                <span style={{ color: "#4ADE80" }}>{completedPct}%</span>
+              </div>
+              <div style={{ height: 6, background: "rgba(255, 255, 255, 0.05)", borderRadius: 3, overflow: "hidden", position: "relative", border: "1px solid rgba(255,255,255,0.03)" }}>
+                <div 
+                  className="animate-shimmer" 
+                  style={{ 
+                    width: completedPct + "%", 
+                    height: "100%", 
+                    background: "linear-gradient(90deg, #4ADE80 0%, #22C55E 50%, #4ADE80 100%)", 
+                    backgroundSize: "200% 100%", 
+                    borderRadius: 3, 
+                    transition: "width 0.6s ease" 
+                  }}
+                ></div>
+              </div>
             </div>
           </Card>
         </div>
       </div>
+
+      {/* Full-screen Map Modal */}
+      {showFullMapModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(6, 17, 10, 0.82)",
+          backdropFilter: "blur(10px)",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+          animation: "fadeIn 0.25s ease-out"
+        }}>
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes zoomIn {
+              from { transform: scale(0.95); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+          ` }} />
+          
+          <div style={{
+            background: "rgba(10, 25, 15, 0.98)",
+            border: "1px solid rgba(74, 222, 128, 0.25)",
+            borderRadius: 20,
+            width: "92%",
+            maxWidth: 1150,
+            height: "82vh",
+            display: "grid",
+            gridTemplateColumns: "350px 1fr",
+            overflow: "hidden",
+            boxShadow: "0 25px 60px rgba(0,0,0,0.85)",
+            animation: "zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+          }}>
+            {/* Modal Left Column: Stop Details & Actions */}
+            <div style={{
+              borderRight: "1px solid rgba(255,255,255,0.06)",
+              display: "flex",
+              flexDirection: "column",
+              background: "rgba(0,0,0,0.2)"
+            }}>
+              <div style={{ padding: 20, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#F8FAFC", display:"flex", alignItems:"center", gap:6 }}>
+                    <MapPin size={16} color="#4ADE80" /> {region}
+                  </div>
+                  <span style={{ fontSize: 10, background: "rgba(74,222,128,0.12)", color: "#4ADE80", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                    AI Optimized
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: 16, fontSize: 11, color: "#94A3B8" }}>
+                  <div>Completed: <span style={{ color: "#F8FAFC", fontWeight: 700 }}>{completedVisits.length} / {filteredVisits.length}</span></div>
+                  <div>Distance: <span style={{ color: "#4ADE80", fontWeight: 700 }}>{activeDistance} km</span></div>
+                  <div>Time: <span style={{ color: "#F8FAFC", fontWeight: 700 }}>{activeTime}</span></div>
+                </div>
+              </div>
+
+              {/* Scrollable Itinerary stops */}
+              <div className="custom-scroll" style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                {filteredVisits.length === 0 ? (
+                  <div style={{ textAlign: "center", color: "#64748B", marginTop: 40, fontSize: 12 }}>No stops on the itinerary.</div>
+                ) : (
+                  filteredVisits.map((item, idx) => {
+                    const isPtCompleted = completedVisits.includes(item.id);
+                    const isNext = routeStarted && nextStop && nextStop.id === item.id;
+                    return (
+                      <div 
+                        key={item.id} 
+                        onClick={() => handleToggleVisit(item)}
+                        style={{
+                          background: isPtCompleted 
+                            ? "rgba(255,255,255,0.01)" 
+                            : isNext 
+                              ? "rgba(59,130,246,0.04)" 
+                              : "rgba(255,255,255,0.02)",
+                          border: `1px solid ${
+                            isPtCompleted 
+                              ? "rgba(255,255,255,0.04)" 
+                              : isNext 
+                                ? "rgba(59,130,246,0.4)" 
+                                : "rgba(255,255,255,0.06)"
+                          }`,
+                          borderRadius: 10,
+                          padding: "12px 14px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          transition: "all 0.2s"
+                        }}
+                        onMouseEnter={e => { if(!isPtCompleted && !isNext) e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"; }}
+                        onMouseLeave={e => { if(!isPtCompleted && !isNext) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                      >
+                        <div style={{
+                          width: 22, height: 22, borderRadius: "50%",
+                          background: isPtCompleted ? "#16A34A" : isNext ? "#2563EB" : "rgba(255,255,255,0.05)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, fontWeight: 800, color: "#fff", flexShrink: 0
+                        }}>
+                          {isPtCompleted ? "✓" : idx + 1}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ 
+                            fontSize: 13, 
+                            fontWeight: 700, 
+                            color: isPtCompleted ? "#64748B" : "#F8FAFC",
+                            textDecoration: isPtCompleted ? "line-through" : "none",
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+                          }}>
+                            {item.name}
+                          </div>
+                          <div style={{ fontSize: 10, color: "#64748B", marginTop: 2, display: "flex", justifyContent: "space-between" }}>
+                            <span>Potential: <span style={{ color: isPtCompleted ? "#64748B" : "#4ADE80", fontWeight: 600 }}>₹{item.revenue.toLocaleString()}</span></span>
+                            <span>Score: {item.score}</span>
+                          </div>
+                        </div>
+                        {isNext && (
+                          <span style={{ fontSize: 8, background: "#3B82F6", color: "#fff", padding: "2px 5px", borderRadius: 4, fontWeight: 900 }}>
+                            NEXT
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Simulation bottom panel */}
+              {routeStarted && nextStop && (
+                <div style={{ padding: 16, borderTop: "1px solid rgba(255,255,255,0.05)", background: "rgba(59,130,246,0.03)" }}>
+                  <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 8 }}>Active Target Stop: <span style={{ color: "#60A5FA", fontWeight: 700 }}>{nextStop.name}</span></div>
+                  <button 
+                    onClick={handleSimulateNextStop}
+                    style={{
+                      width: "100%",
+                      background: "#3B82F6",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "10px 14px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                      transition: "background 0.2s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#2563EB"}
+                    onMouseLeave={e => e.currentTarget.style.background = "#3B82F6"}
+                  >
+                    🚀 Simulate Arrival & Check-in
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Right Column: Large Interactive Map */}
+            <div style={{ display: "flex", flexDirection: "column", position: "relative" }}>
+              {/* Header */}
+              <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#F8FAFC" }}>AI Routing Visualization</div>
+                  <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>Click nodes on the map to toggle check-in progress. Blue dot represents active location.</div>
+                </div>
+                <button 
+                  onClick={() => setShowFullMapModal(false)}
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8,
+                    width: 32, height: 32,
+                    color: "#F8FAFC",
+                    fontSize: 16,
+                    cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center"
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.3)"; e.currentTarget.style.color = "#EF4444"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#F8FAFC"; }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Large Map Area */}
+              <div style={{ flex: 1, background: "#06130A", position: "relative" }}>
+                {/* Fake grid map backdrop */}
+                <div style={{ position: "absolute", inset: 0, opacity: 0.18, backgroundImage: "linear-gradient(rgba(74,222,128,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.15) 1px, transparent 1px)", backgroundSize: "30px 30px" }}></div>
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+                  <svg width="100%" height="100%" viewBox="0 0 450 300" style={{ maxHeight: "100%" }}>
+                    {/* Path connecting stops */}
+                    {filteredVisits.length > 1 && (
+                      <path 
+                        d={filteredVisits.map((v, idx) => `${idx === 0 ? "M" : "L"} ${v.x},${v.y}`).join(" ")} 
+                        fill="none" 
+                        stroke="#4ADE80" 
+                        strokeWidth="3" 
+                        strokeDasharray="6 6" 
+                        style={{ transition: "all 0.5s ease" }}
+                      />
+                    )}
+
+                    {/* Nodes with labels */}
+                    {filteredVisits.map((pt, idx) => {
+                      const isPtCompleted = completedVisits.includes(pt.id);
+                      const isNext = routeStarted && nextStop && nextStop.id === pt.id;
+                      return (
+                        <g key={pt.id} style={{ cursor: "pointer" }} onClick={() => handleToggleVisit(pt)}>
+                          {/* Pulsing ring for next target stop */}
+                          {isNext && (
+                            <circle 
+                              cx={pt.x} 
+                              cy={pt.y} 
+                              r="20" 
+                              fill="none" 
+                              stroke="#3B82F6" 
+                              strokeWidth="2.5" 
+                              style={{ opacity: 0.7, animation: "ping 1.5s infinite", transformBox: "fill-box", transformOrigin: "center" }} 
+                            />
+                          )}
+                          <circle 
+                            cx={pt.x} 
+                            cy={pt.y} 
+                            r={isNext ? "14" : "11"} 
+                            fill={isPtCompleted ? "#16A34A" : isNext ? "#2563EB" : "rgba(10,24,15,0.95)"} 
+                            stroke={isPtCompleted ? "rgba(74,222,128,0.4)" : isNext ? "#3B82F6" : pt.score > 90 ? "#4ADE80" : pt.score > 70 ? "#EAB308" : "#F97316"} 
+                            strokeWidth={isPtCompleted ? 4.5 : isNext ? 3 : 2} 
+                            style={{ transition: "all 0.3s ease" }}
+                          />
+                          <text x={pt.x} y={pt.y+4} fontSize="9" fill={isPtCompleted ? "#fff" : isNext ? "#fff" : "#CBD5E1"} textAnchor="middle" fontWeight="bold">
+                            {isPtCompleted ? "✓" : idx + 1}
+                          </text>
+
+                          {/* Label Text for store name */}
+                          <text 
+                            x={pt.x} 
+                            y={pt.y - 16} 
+                            fontSize="9" 
+                            fill={isPtCompleted ? "#64748B" : isNext ? "#60A5FA" : "#F8FAFC"} 
+                            fontWeight={isNext ? "bold" : 600}
+                            textAnchor="middle"
+                            style={{ textShadow: "1px 1px 2px #000" }}
+                          >
+                            {pt.name.split(" ")[0]} {pt.name.split(" ")[1] || ""}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {/* Animated GPS User location dot */}
+                    <circle 
+                      cx={userLoc.x} 
+                      cy={userLoc.y} 
+                      r="14" 
+                      fill="rgba(59, 130, 246, 0.2)" 
+                      stroke="none" 
+                      style={{ transition: "cx 0.8s ease-in-out, cy 0.8s ease-in-out" }} 
+                    />
+                    <circle 
+                      cx={userLoc.x} 
+                      cy={userLoc.y} 
+                      r="7" 
+                      fill="#3B82F6" 
+                      stroke="#fff" 
+                      strokeWidth="2" 
+                      style={{ transition: "cx 0.8s ease-in-out, cy 0.8s ease-in-out" }} 
+                    />
+                  </svg>
+                </div>
+
+                {/* Legend panel */}
+                <div style={{
+                  position: "absolute",
+                  bottom: 16,
+                  left: 20,
+                  background: "rgba(10,24,15,0.92)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: 8,
+                  padding: "10px 14px",
+                  display: "flex",
+                  gap: 16,
+                  fontSize: 10,
+                  color: "#94A3B8"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#16A34A" }}></div> Completed
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#2563EB" }}></div> Next Stop
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#0F1F14", border: "1px solid #4ADE80" }}></div> Pending Stop
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#3B82F6", border: "1.5px solid #fff" }}></div> GPS Location
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -3139,6 +4121,7 @@ const CropRiskDrawer = ({ isOpen, data, onClose, onNav }) => {
 
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
+  const { role } = useUIStore();
   const [page, setPage]   = useState("dashboard");
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState(todayTasks.map(t=>({...t, done:false})));
@@ -3185,29 +4168,41 @@ export default function App() {
     weather:  <WeatherPage onNav={handleNav} />,
   };
 
+  if (role === "manager") {
+    return (
+      <BrowserRouter>
+        <div id="manager-root" className="dark">
+          <ManagerApp />
+        </div>
+      </BrowserRouter>
+    );
+  }
+
   return (
-    <div style={{ display:"flex", height:"100vh", background:"linear-gradient(160deg,#0A1A0F 0%,#0D1F12 50%,#080F10 100%)", fontFamily:"'DM Sans',sans-serif", overflow:"hidden" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        .shimmer-bg {
-          background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite linear;
-        }
-      `}</style>
-      <Sidebar active={page} onNav={handleNav} />
-      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <TopBar page={page} />
-        <main style={{ flex:1, overflowY:"auto", padding:"28px 32px" }}>
-          {loading ? <SkeletonLoader /> : PAGES[page]}
-        </main>
+    <BrowserRouter>
+      <div style={{ display:"flex", height:"100vh", background:"linear-gradient(160deg,#0A1A0F 0%,#0D1F12 50%,#080F10 100%)", fontFamily:"'DM Sans',sans-serif", overflow:"hidden" }}>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+        <style>{`
+          @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .shimmer-bg {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+          }
+        `}</style>
+        <Sidebar active={page} onNav={handleNav} />
+        <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+          <TopBar page={page} />
+          <main style={{ flex:1, overflowY:"auto", padding:"28px 32px" }}>
+            {loading ? <SkeletonLoader /> : PAGES[page]}
+          </main>
+        </div>
+        <TaskDrawer isOpen={!!drawerData} data={drawerData} onClose={() => setDrawerData(null)} />
+        <CropRiskDrawer isOpen={!!cropDrawerData} data={cropDrawerData} onClose={() => setCropDrawerData(null)} onNav={handleNav} />
       </div>
-      <TaskDrawer isOpen={!!drawerData} data={drawerData} onClose={() => setDrawerData(null)} />
-      <CropRiskDrawer isOpen={!!cropDrawerData} data={cropDrawerData} onClose={() => setCropDrawerData(null)} onNav={handleNav} />
-    </div>
+    </BrowserRouter>
   );
 }
