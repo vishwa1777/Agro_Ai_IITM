@@ -1,35 +1,32 @@
 import mongoose from "mongoose";
 
-const growerSchema =
+const productSchema =
   new mongoose.Schema(
     {
       name: String,
 
-      phone: String,
+      packSize: String,
 
-      location: String,
+      stock: Number,
 
-      landArea: Number,
+      stockPercentage: Number,
 
-      crop: String,
-
-      cropStage: String,
-
-      riskLevel: {
+      alertLevel: {
         type: String,
         enum: [
+          "Critical",
           "Low",
           "Medium",
-          "High"
+          "Healthy"
         ]
       },
 
-      advisory: String
+      warehouse: String
     },
     { timestamps: true }
   );
 
 export default mongoose.model(
-  "Grower",
-  growerSchema
+  "Product",
+  productSchema
 );
