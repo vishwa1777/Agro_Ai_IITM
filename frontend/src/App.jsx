@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { useUIStore } from "./store";
 import ManagerApp from "./components/manager/ManagerApp";
+import LoginPage from "./components/auth/LoginPage";
 import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, ChevronDown, Check, X, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, Bug, FlaskConical, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, TrendingDown, Minus, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Area, AreaChart, PieChart, Pie, LineChart, Line } from "recharts";
 
@@ -165,7 +166,7 @@ const KpiCard = ({ icon, iconBg, label, value, valueColor, sub, onClick }) => (
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 const Sidebar = ({ active, onNav }) => {
-  const { role, setRole } = useUIStore();
+  const { role, setRole, logout } = useUIStore();
   return (
     <aside style={{
       width:240, flexShrink:0, background:"rgba(8,18,12,0.97)",
@@ -197,20 +198,19 @@ const Sidebar = ({ active, onNav }) => {
         </button>
       ))}
       <div style={{ marginTop:"auto", padding:"20px 10px 0", borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:12 }}>
-        {/* Role Switcher */}
+        {/* Log Out */}
         <button
           onClick={() => {
-            setRole('manager');
-            // Force redirect to root path of manager
+            logout();
             window.location.href = '/';
           }}
           style={{
             width: "100%",
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid rgba(74, 222, 128, 0.3)",
-            background: "rgba(74, 222, 128, 0.08)",
-            color: "#4ADE80",
+            border: "1px solid rgba(239, 68, 68, 0.3)",
+            background: "rgba(239, 68, 68, 0.05)",
+            color: "#F87171",
             fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
@@ -222,15 +222,15 @@ const Sidebar = ({ active, onNav }) => {
             transition: "all 0.2s"
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.background = "rgba(74, 222, 128, 0.16)";
-            e.currentTarget.style.boxShadow = "0 0 12px rgba(74, 222, 128, 0.15)";
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)";
+            e.currentTarget.style.boxShadow = "0 0 12px rgba(239, 68, 68, 0.15)";
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.background = "rgba(74, 222, 128, 0.08)";
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.05)";
             e.currentTarget.style.boxShadow = "none";
           }}
         >
-          <span>🔄</span> Switch to District Manager
+          <span>🚪</span> Log Out
         </button>
 
         {/* User profile card */}
@@ -4121,7 +4121,7 @@ const CropRiskDrawer = ({ isOpen, data, onClose, onNav }) => {
 
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const { role } = useUIStore();
+  const { role, isAuthenticated } = useUIStore();
   const [page, setPage]   = useState("dashboard");
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState(todayTasks.map(t=>({...t, done:false})));
@@ -4167,6 +4167,10 @@ export default function App() {
     crop:     <CropPage onNav={handleNav} initialCrop={selectedCropParam} />,
     weather:  <WeatherPage onNav={handleNav} />,
   };
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   if (role === "manager") {
     return (

@@ -38,6 +38,21 @@ export const useUIStore = create<UIState>((set) => ({
     }
     set({ role });
   },
+  isAuthenticated: typeof window !== 'undefined' ? localStorage.getItem('agro_ai_auth') === 'true' : false,
+  login: (role) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('agro_ai_auth', 'true');
+      localStorage.setItem('agro_ai_role', role);
+    }
+    set({ isAuthenticated: true, role });
+  },
+  logout: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('agro_ai_auth');
+      localStorage.removeItem('agro_ai_role');
+    }
+    set({ isAuthenticated: false });
+  },
 }));
 
 export const useDataStore = create<DataState>((set) => ({

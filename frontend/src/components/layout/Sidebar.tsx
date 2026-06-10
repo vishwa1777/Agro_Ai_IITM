@@ -20,7 +20,7 @@ const navItems = [
 ];
 
 const Sidebar: React.FC = () => {
-  const { sidebarCollapsed, toggleSidebar, setRole } = useUIStore();
+  const { sidebarCollapsed, toggleSidebar, logout } = useUIStore();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -133,16 +133,15 @@ const Sidebar: React.FC = () => {
         
         <button
           onClick={() => {
-            setRole('representative');
-            // Force redirect to root path just to ensure representative view mounts on a clean state
+            logout();
             window.location.href = '/';
           }}
-          className={`w-full flex items-center gap-2 h-9 rounded-md justify-center border border-[rgba(85,216,64,0.3)] bg-[rgba(85,216,64,0.08)] text-[#55D840] hover:bg-[rgba(85,216,64,0.16)] transition-all text-xs font-semibold ${
+          className={`w-full flex items-center gap-2 h-9 rounded-md justify-center border border-red-500/30 bg-red-500/5 text-red-400 hover:bg-red-500/12 hover:text-red-300 transition-all text-xs font-semibold ${
             sidebarCollapsed ? 'p-0 w-8 h-8 mx-auto' : 'px-3'
           }`}
-          title="Switch to Field Rep"
+          title="Log Out"
         >
-          {sidebarCollapsed ? '🔄' : <><span>🔄</span> Switch to Field Rep</>}
+          {sidebarCollapsed ? '🚪' : <><span>🚪</span> Log Out</>}
         </button>
 
         {/* Sync Status */}

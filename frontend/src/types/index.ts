@@ -124,6 +124,9 @@ export interface UIState {
   unreadCount: number;
   role: 'representative' | 'manager';
   setRole: (role: 'representative' | 'manager') => void;
+  isAuthenticated: boolean;
+  login: (role: 'representative' | 'manager') => void;
+  logout: () => void;
 }
 
 export interface DataState {
