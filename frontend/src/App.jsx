@@ -860,7 +860,7 @@ const Overview = ({ tasks, onToggleTask, onNav }) => {
                 <KpiCard
                     icon={<Calendar size={22} />}
                     iconBg="rgba(74,222,128,0.2)"
-                    label="Avg. Visits/Day"
+                    label="Avg. Visits/Week"
                     value={vL ? "…" : avgVisits}
                     valueColor="#4ADE80"
                     sub="vs Target: 2.0"
@@ -1325,15 +1325,15 @@ const VisitPage = () => {
                     label="Avg. Actual Visits"
                     value={loading ? "…" : avg}
                     valueColor="#4ADE80"
-                    sub="Visits/Day"
+                    sub="Visits/Week"
                 />
                 <KpiCard
                     icon={<Target size={22} />}
                     iconBg="rgba(56,189,248,0.2)"
-                    label="Target Visits/Day"
+                    label="Target Visits/Week"
                     value={TARGET}
                     valueColor="#38BDF8"
-                    sub="Visits/Day"
+                    sub="Visits/Week"
                 />
                 <KpiCard
                     icon={<TrendingUp size={22} />}
