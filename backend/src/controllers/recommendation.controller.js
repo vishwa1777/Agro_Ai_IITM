@@ -1,14 +1,7 @@
-import {
-  generateRecommendations
-} from "../services/recommendation.service.js";
+import { generateRecommendations } from "../services/recommendation.service.js";
 
-export const getRecommendations =
-  async (req, res) => {
+export const getRecommendations = async (req, res) => {
+    const recommendations = await generateRecommendations();
 
-    const recommendations =
-      await generateRecommendations();
-
-    res.json(
-      recommendations
-    );
-  };
+    res.json(recommendations);
+};

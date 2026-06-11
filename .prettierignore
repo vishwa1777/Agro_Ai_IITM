@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Production Build Directories
+dist/
+build/
+out/
+
+# Environment Variables & Configuration Locks
+.env
+.env.*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Visual Studio Code & System Logs
+.vscode/
+.idea/
+*.log
+.DS_Store

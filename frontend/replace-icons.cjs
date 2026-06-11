@@ -1,14 +1,16 @@
-const fs = require('fs');
+const fs = require("fs");
 
-let code = fs.readFileSync('src/App.jsx', 'utf-8');
+let code = fs.readFileSync("src/App.jsx", "utf-8");
 
 const imports = `import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, ChevronDown, Check, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, Bug, FlaskConical, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, TrendingDown, Minus, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf } from "lucide-react";\n`;
 
-if (!code.includes('lucide-react')) {
-  code = code.replace('import { BarChart', imports + 'import { BarChart');
+if (!code.includes("lucide-react")) {
+    code = code.replace("import { BarChart", imports + "import { BarChart");
 }
 
-const r = (search, replace) => { code = code.split(search).join(replace); };
+const r = (search, replace) => {
+    code = code.split(search).join(replace);
+};
 
 // NAV array
 r(`icon:"🏠"`, `icon:<Home size={18}/>`);
@@ -71,7 +73,10 @@ r(`🌾 Crop Risk`, `<Wheat size={14} style={{marginRight:8}}/> Crop Risk`);
 r(`{task.done?"✓":""}`, `{task.done ? <Check size={14} /> : null}`);
 
 // Weather Page
-r(`title="Weather Alert 🌨️"`, `title={<span>Weather Alert <CloudRain size={18} style={{marginLeft:8}}/></span>}`);
+r(
+    `title="Weather Alert 🌨️"`,
+    `title={<span>Weather Alert <CloudRain size={18} style={{marginLeft:8}}/></span>}`
+);
 r(`>🌧️<`, `><CloudRain size={64}/><`);
 r(`<span>📍</span>`, `<span><MapPin size={14}/></span>`);
 r(`<span>💧</span>`, `<span><CloudRain size={14}/></span>`);
@@ -110,5 +115,5 @@ r(`<span>🗺️</span>`, `<span><Map size={16}/></span>`);
 r(`>🪲<`, `><Bug size={20}/><`);
 r(`>🧪<`, `><FlaskConical size={20}/><`);
 
-fs.writeFileSync('src/App.jsx', code);
+fs.writeFileSync("src/App.jsx", code);
 console.log("Replacements complete!");

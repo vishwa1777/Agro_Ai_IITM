@@ -1,0 +1,22 @@
+{
+    "name": "agroai",
+    "version": "1.0.0",
+    "description": "AgroAI - AI Powered Agricultural Analytics Platform",
+    "private": true,
+    "type": "module",
+    "author": "Team InfernoX",
+    "scripts": {
+        "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+        "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+        "backend": "npm run dev --prefix backend",
+        "frontend": "npm run dev --prefix frontend",
+        "seed": "npm run seed --prefix backend",
+        "seed:fresh": "npm run seed --prefix backend -- --fresh",
+        "build:frontend": "npm run build --prefix frontend",
+        "format": "prettier --write \".\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "prettier": "^3.3.2"
+    }
+}

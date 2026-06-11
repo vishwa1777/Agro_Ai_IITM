@@ -1,30 +1,22 @@
 import mongoose from "mongoose";
 
-const recommendationSchema =
-  new mongoose.Schema(
+const recommendationSchema = new mongoose.Schema(
     {
-      title: String,
+        title: String,
 
-      description: String,
+        description: String,
 
-      priority: {
-        type: String,
-        enum: [
-          "Low",
-          "Medium",
-          "High"
-        ]
-      },
+        priority: {
+            type: String,
+            enum: ["Low", "Medium", "High"],
+        },
 
-      generatedFor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-      }
+        generatedFor: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
     { timestamps: true }
-  );
-
-export default mongoose.model(
-  "Recommendation",
-  recommendationSchema
 );
+
+export default mongoose.model("Recommendation", recommendationSchema);

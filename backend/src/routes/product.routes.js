@@ -3,7 +3,7 @@ import { getProducts, createProduct, updateProduct } from "../controllers/produc
 import protect from "../middleware/auth.middleware.js";
 
 const router = Router();
-router.get("/",    protect, getProducts);
-router.post("/",   protect, createProduct);
+router.get("/", protect, getProducts);
+router.post("/", protect, createProduct);
 router.put("/:id", protect, updateProduct);
 export default router;

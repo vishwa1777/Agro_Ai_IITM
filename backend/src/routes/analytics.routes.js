@@ -3,7 +3,7 @@ import { getRevenue, getVisits, getCropRisk } from "../controllers/analytics.con
 import protect from "../middleware/auth.middleware.js";
 
 const router = Router();
-router.get("/revenue",   protect, getRevenue);
-router.get("/visits",    protect, getVisits);
+router.get("/revenue", protect, getRevenue);
+router.get("/visits", protect, getVisits);
 router.get("/crop-risk", protect, getCropRisk);
 export default router;
