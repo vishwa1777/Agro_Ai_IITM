@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, Check, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf } from "lucide-react";
+import { Home, Calendar, Lightbulb, Search, Store, Users, BarChart2, Settings, IndianRupee, Bell, Wheat, CloudRain, Info, Check, Sun, AlertTriangle, Navigation, TrendingUp, ShieldAlert, User, Phone, MessageSquare, ExternalLink, Activity, Clipboard, MapPin, Target, CheckCircle, Construction, CheckSquare, CornerDownRight, Clock, Play, RefreshCw, Map, Banknote, Leaf, LogOut } from "lucide-react";
+import { useAuth } from "./AuthContext.jsx";
+import LoginPage from "./LoginPage.jsx";
+import RegisterPage from "./RegisterPage.jsx";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Area, AreaChart, PieChart, Pie, LineChart, Line } from "recharts";
 
 // ─── API LAYER ────────────────────────────────────────────────────────────────
@@ -185,37 +188,44 @@ const KpiCard = ({ icon, iconBg, label, value, valueColor, sub, onClick }) => (
 );
 
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
-const Sidebar = ({ active, onNav, criticalCount }) => (
-  <aside style={{ width:240, flexShrink:0, background:"rgba(8,18,12,0.97)", borderRight:"1px solid rgba(255,255,255,0.07)", display:"flex", flexDirection:"column", padding:"28px 16px", gap:4, height:"100vh", position:"sticky", top:0 }}>
-    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0 8px 28px" }}>
-      <div style={{ width:38, height:38, borderRadius:10, background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}><Leaf size={24}/></div>
-      <div>
-        <div style={{ fontSize:16, fontWeight:800, color:"#4ADE80", fontFamily:"'Space Grotesk',sans-serif", lineHeight:1 }}>AgroAI</div>
-        <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Field Intelligence</div>
-      </div>
-    </div>
-    <div style={{ fontSize:9, color:"#334155", fontWeight:700, letterSpacing:2, padding:"0 10px 8px", textTransform:"uppercase" }}>Navigation</div>
-    {NAV.filter(n => !n.hideInSidebar).map(n => (
-      <button key={n.key} onClick={() => onNav(n.key)} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px", borderRadius:10, border:"none", cursor:"pointer", background:active===n.key?"rgba(74,222,128,0.12)":"transparent", borderLeft:active===n.key?"3px solid #4ADE80":"3px solid transparent", color:active===n.key?"#4ADE80":"#64748B", fontSize:13, fontWeight:active===n.key?700:400, fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", textAlign:"left" }}>
-        <span style={{ fontSize:16, width:22, textAlign:"center" }}>{n.icon}</span>
-        {n.label}
-        {n.key==="stock" && criticalCount > 0 && <span style={{ marginLeft:"auto", fontSize:10, background:"rgba(239,68,68,0.2)", color:"#EF4444", borderRadius:5, padding:"2px 6px", fontWeight:700 }}>{criticalCount}</span>}
-      </button>
-    ))}
-    <div style={{ marginTop:"auto", padding:"20px 10px 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}><User size={20}/></div>
+const Sidebar = ({ active, onNav, criticalCount, user, onLogout }) => {
+  const initials = (user?.name ?? "?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+  return (
+    <aside style={{ width:240, flexShrink:0, background:"rgba(8,18,12,0.97)", borderRight:"1px solid rgba(255,255,255,0.07)", display:"flex", flexDirection:"column", padding:"28px 16px", gap:4, height:"100vh", position:"sticky", top:0 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0 8px 28px" }}>
+        <div style={{ width:38, height:38, borderRadius:10, background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}><Leaf size={24}/></div>
         <div>
-          <div style={{ fontSize:13, fontWeight:700, color:"#CBD5E1" }}>Amit Sharma</div>
-          <div style={{ fontSize:10, color:"#475569" }}>Field Representative</div>
+          <div style={{ fontSize:16, fontWeight:800, color:"#4ADE80", fontFamily:"'Space Grotesk',sans-serif", lineHeight:1 }}>AgroAI</div>
+          <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Field Intelligence</div>
         </div>
       </div>
-    </div>
-  </aside>
-);
+      <div style={{ fontSize:9, color:"#334155", fontWeight:700, letterSpacing:2, padding:"0 10px 8px", textTransform:"uppercase" }}>Navigation</div>
+      {NAV.filter(n => !n.hideInSidebar).map(n => (
+        <button key={n.key} onClick={() => onNav(n.key)} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px", borderRadius:10, border:"none", cursor:"pointer", background:active===n.key?"rgba(74,222,128,0.12)":"transparent", borderLeft:active===n.key?"3px solid #4ADE80":"3px solid transparent", color:active===n.key?"#4ADE80":"#64748B", fontSize:13, fontWeight:active===n.key?700:400, fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", textAlign:"left" }}>
+          <span style={{ fontSize:16, width:22, textAlign:"center" }}>{n.icon}</span>
+          {n.label}
+          {n.key==="stock" && criticalCount > 0 && <span style={{ marginLeft:"auto", fontSize:10, background:"rgba(239,68,68,0.2)", color:"#EF4444", borderRadius:5, padding:"2px 6px", fontWeight:700 }}>{criticalCount}</span>}
+        </button>
+      ))}
+      <div style={{ marginTop:"auto", padding:"16px 10px 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(74,222,128,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:700, color:"#4ADE80" }}>{initials}</div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:13, fontWeight:700, color:"#CBD5E1", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.name ?? "User"}</div>
+            <div style={{ fontSize:10, color:"#475569", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.role ?? "Field Representative"}</div>
+          </div>
+          <button onClick={onLogout} title="Sign out" style={{ width:28, height:28, borderRadius:6, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.15)", color:"#EF4444", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <LogOut size={13}/>
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+};
 
 // ─── TOPBAR ───────────────────────────────────────────────────────────────────
-const TopBar = ({ page, dashboard }) => {
+const TopBar = ({ page, dashboard, onLogout }) => {
+  const { user } = useAuth();
   const item = NAV.find(n=>n.key===page)||NAV[0];
   const criticalStocks = dashboard?.criticalStocks ?? 0;
   const hasWeather = !!dashboard?.weather;
@@ -235,13 +245,16 @@ const TopBar = ({ page, dashboard }) => {
           </div>
         )}
         <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"5px 12px", fontSize:12, color:"#F8FAFC" }}>
-          <Navigation size={14}/> Jhansi Region
+          <Navigation size={14}/> {user?.region ?? "Jhansi Region"}
         </div>
         {hasWeather && (
           <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(74,222,128,0.08)", border:"1px solid rgba(74,222,128,0.15)", borderRadius:8, padding:"5px 12px", fontSize:12, color:"#4ADE80" }}>
             <CloudRain size={14}/> {dashboard.weather.description ?? "Weather Active"}
           </div>
         )}
+        <button onClick={onLogout} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(239,68,68,0.07)", border:"1px solid rgba(239,68,68,0.15)", borderRadius:8, padding:"5px 12px", fontSize:12, color:"#EF4444", cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+          <LogOut size={13}/> Sign Out
+        </button>
       </div>
     </div>
   );
@@ -249,6 +262,8 @@ const TopBar = ({ page, dashboard }) => {
 
 // ─── OVERVIEW PAGE ────────────────────────────────────────────────────────────
 const Overview = ({ tasks, onToggleTask, onNav }) => {
+  const { user } = useAuth();
+  const firstName = (user?.name ?? "there").split(" ")[0];
   const today = new Date().toLocaleDateString("en-IN",{ weekday:"long", year:"numeric", month:"long", day:"numeric" });
   const { data: dashboard, loading: dashLoading }    = useFetch("/dashboard", {});
   const { chartData: visitChartData, loading: vL }   = useVisitChartData();
@@ -267,7 +282,7 @@ const Overview = ({ tasks, onToggleTask, onNav }) => {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
           <div style={{ fontSize:26, fontWeight:800, fontFamily:"'Space Grotesk',sans-serif" }}>
-            <span style={{ color:"#F8FAFC" }}>Good Morning, </span><span style={{ color:"#4ADE80" }}>Amit</span>
+            <span style={{ color:"#F8FAFC" }}>Good Morning, </span><span style={{ color:"#4ADE80" }}>{firstName}</span>
           </div>
           <div style={{ fontSize:12, color:"#475569", marginTop:4 }}>{today}</div>
         </div>
@@ -973,7 +988,7 @@ const AnalyticsPage = () => {
           {pL ? <Spinner height={140}/> : productDist.length===0 ? <ErrMsg msg="No product data"/> : (
             <>
               <div style={{ display:"flex", justifyContent:"center", position:"relative", height:140 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
                     <Pie data={productDist} cx="50%" cy="50%" innerRadius={45} outerRadius={60} paddingAngle={4} dataKey="value">
                       {productDist.map((e,i)=><Cell key={i} fill={e.color}/>)}
@@ -986,15 +1001,15 @@ const AnalyticsPage = () => {
                   <div style={{ fontSize:14, fontWeight:700, color:"#F8FAFC" }}>{productDist.length}</div>
                 </div>
               </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:8, marginTop:10 }}>
-                {productDist.map(item=>(
-                  <div key={item.name} style={{ display:"flex", alignItems:"center", gap:10, fontSize:11 }}>
-                    <div style={{ width:10, height:10, borderRadius:2, background:item.color }}/>
-                    <span style={{ color:"#CBD5E1", flex:1 }}>{item.name}</span>
-                    <span style={{ color:"#94A3B8", fontWeight:700 }}>{item.value.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8, marginTop:10 }}>
+                  {productDist.map((item, index) => (
+                    <div key={`${item._id ?? item.name ?? 'prod'}-${index}`} style={{ display:"flex", alignItems:"center", gap:10, fontSize:11 }}>
+                      <div style={{ width:10, height:10, borderRadius:2, background:item.color }}/>
+                      <span style={{ color:"#CBD5E1", flex:1 }}>{item.name}</span>
+                      <span style={{ color:"#94A3B8", fontWeight:700 }}>{item.value.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
             </>
           )}
         </Card>
@@ -1275,15 +1290,15 @@ const Switch = ({ checked, onChange }) => (
   </div>
 );
 
-const SettingsPage = () => {
+const SettingsPage = ({ user = {} }) => {
   const [activeTab, setActiveTab]     = useState("profile");
   const [depot, setDepot]             = useState("Jhansi Depot");
   const [stockAlerts, setStockAlerts] = useState(true);
   const [riskAlerts, setRiskAlerts]   = useState(true);
   const [weatherAlerts, setWeatherAlerts] = useState(true);
-  const [phone, setPhone]             = useState("+91 94123 45678");
-  const [vehicle, setVehicle]         = useState("UP-93-AB-4321");
-  const [territory, setTerritory]     = useState("Jhansi Cluster-C");
+  const [phone, setPhone]             = useState(user.phone ?? "+91 94123 45678");
+  const [vehicle, setVehicle]         = useState(user.vehicle ?? "UP-93-AB-4321");
+  const [territory, setTerritory]     = useState(user.region ?? "Jhansi Cluster-C");
   const [syncing, setSyncing]         = useState(false);
   const [saving, setSaving]           = useState(false);
   const [lastSync, setLastSync]       = useState("10 June 2026, 04:30 AM");
@@ -1316,17 +1331,19 @@ const SettingsPage = () => {
         {activeTab==="profile" && (
           <>
             <Card style={{ display:"flex", alignItems:"center", gap:20, padding:20 }}>
-              <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(74,222,128,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, color:"#4ADE80", fontWeight:700, border:"2px solid rgba(74,222,128,0.3)" }}>AS</div>
+              <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(74,222,128,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, color:"#4ADE80", fontWeight:700, border:"2px solid rgba(74,222,128,0.3)" }}>
+                {(user.name ?? "?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2)}
+              </div>
               <div>
-                <div style={{ fontSize:18, fontWeight:800, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>Amit Sharma</div>
-                <div style={{ fontSize:12, color:"#64748B", marginTop:2 }}>Field Representative • Jhansi Cluster-C</div>
+                <div style={{ fontSize:18, fontWeight:800, color:"#F8FAFC", fontFamily:"'Space Grotesk',sans-serif" }}>{user.name ?? "—"}</div>
+                <div style={{ fontSize:12, color:"#64748B", marginTop:2 }}>{user.role ?? "Field Representative"} • {user.region ?? "—"}</div>
                 <span style={{ fontSize:9, background:"rgba(74,222,128,0.12)", color:"#4ADE80", padding:"2px 6px", borderRadius:4, fontWeight:700, display:"inline-block", marginTop:6 }}>ONLINE STATUS: ACTIVE</span>
               </div>
             </Card>
             <Card style={{ display:"flex", flexDirection:"column", gap:20 }}>
               <div style={{ fontSize:15, fontWeight:700, color:"#F8FAFC", borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:10 }}>Personal Information</div>
-              <div style={{ display:"flex", gap:16 }}><FormInput label="Full Name" value="Amit Sharma" readOnly/><FormInput label="Employee ID" value="#AGR-49102" readOnly/></div>
-              <div style={{ display:"flex", gap:16 }}><FormInput label="Email" value="amit.sharma@agroai.com" readOnly/><FormInput label="Designation" value="Senior Field Executive" readOnly/></div>
+              <div style={{ display:"flex", gap:16 }}><FormInput label="Full Name" value={user.name ?? ""} readOnly/><FormInput label="Email" value={user.email ?? ""} readOnly/></div>
+              <div style={{ display:"flex", gap:16 }}><FormInput label="Role" value={user.role ?? ""} readOnly/><FormInput label="Region" value={user.region ?? ""} readOnly/></div>
               <div style={{ display:"flex", gap:16 }}><FormInput label="Contact Phone" value={phone} onChange={e=>setPhone(e.target.value)}/><FormInput label="Assigned Cluster" value={territory} onChange={e=>setTerritory(e.target.value)}/></div>
               <div style={{ display:"flex", gap:16 }}><FormInput label="Vehicle No." value={vehicle} onChange={e=>setVehicle(e.target.value)}/><div style={{flex:1}}/></div>
               <div style={{ borderTop:"1px solid rgba(255,255,255,0.05)", paddingTop:16, display:"flex", justifyContent:"flex-end" }}>
@@ -1423,13 +1440,62 @@ const SkeletonLoader = () => (
 
 // ─── ROOT APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage]         = useState("dashboard");
-  const [pageLoading, setPageLoading] = useState(false);
-  const { data: dashboard }     = useFetch("/dashboard", {});
+  const { user, loading: authLoading, logout } = useAuth();
+  const [authView, setAuthView] = useState("login"); // "login" | "register"
 
-  // Tasks: fetched live from /tasks, with local done-toggle
-  const { data: rawTasks }      = useFetch("/tasks", []);
-  const [doneIds, setDoneIds]   = useState(new Set());
+  // Google Fonts loaded once
+  const fonts = (
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
+      <style>{`
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        @keyframes spin    { to { transform: rotate(360deg); } }
+        .shimmer-bg { background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.03) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite linear; }
+        * { box-sizing:border-box; }
+        input, select { color-scheme: dark; }
+        input:focus, select:focus { border-color: rgba(74,222,128,0.4) !important; }
+      `}</style>
+    </>
+  );
+
+  // While verifying existing token
+  if (authLoading) {
+    return (
+      <div style={{ height:"100vh", background:"#0A1A0F", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',sans-serif" }}>
+        {fonts}
+        <div style={{ textAlign:"center" }}>
+          <div style={{ width:40, height:40, borderRadius:"50%", border:"3px solid rgba(74,222,128,0.2)", borderTopColor:"#4ADE80", animation:"spin 0.8s linear infinite", margin:"0 auto 16px" }}/>
+          <div style={{ color:"#475569", fontSize:13 }}>Verifying session…</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in — show login or register
+  if (!user) {
+    return (
+      <>
+        {fonts}
+        {authView === "login"
+          ? <LoginPage    onSwitchToRegister={()=>setAuthView("register")}/>
+          : <RegisterPage onSwitchToLogin={()=>setAuthView("login")}/>
+        }
+      </>
+    );
+  }
+
+  // ── Logged in ─────────────────────────────────────────────────────────────
+  return <Dashboard user={user} onLogout={logout} fonts={fonts}/>;
+}
+
+// ─── DASHBOARD (authenticated shell) ─────────────────────────────────────────
+function Dashboard({ user, onLogout, fonts }) {
+  const [page, setPage]               = useState("dashboard");
+  const [pageLoading, setPageLoading] = useState(false);
+  const { data: dashboard }           = useFetch("/dashboard", {});
+
+  const { data: rawTasks }    = useFetch("/tasks", []);
+  const [doneIds, setDoneIds] = useState(new Set());
   const tasks = useMemo(() => {
     if (!Array.isArray(rawTasks)) return [];
     return rawTasks.map(t => ({ ...t, done: doneIds.has(t._id ?? t.id) }));
@@ -1450,32 +1516,27 @@ export default function App() {
   const criticalCount = dashboard?.criticalStocks ?? 0;
 
   const PAGES = {
-    dashboard:        <Overview tasks={tasks} onToggleTask={toggleTask} onNav={setPage}/>,
-    visitPlanner:     <VisitPlannerPage/>,
-    aiRecommendations:<AiRecommendationsPage/>,
-    riskAnalyzer:     <RiskAnalyzerPage/>,
-    retailerInsights: <RetailerInsightsPage/>,
-    growerInsights:   <GrowerInsightsPage/>,
-    analytics:        <AnalyticsPage/>,
-    settings:         <SettingsPage/>,
-    visit:            <VisitPage/>,
-    revenue:          <RevenuePage/>,
-    stock:            <StockPage/>,
-    crop:             <CropPage/>,
-    weather:          <WeatherPage/>,
+    dashboard:         <Overview tasks={tasks} onToggleTask={toggleTask} onNav={setPage}/>,
+    visitPlanner:      <VisitPlannerPage/>,
+    aiRecommendations: <AiRecommendationsPage/>,
+    riskAnalyzer:      <RiskAnalyzerPage/>,
+    retailerInsights:  <RetailerInsightsPage/>,
+    growerInsights:    <GrowerInsightsPage/>,
+    analytics:         <AnalyticsPage/>,
+    settings:          <SettingsPage user={user}/>,
+    visit:             <VisitPage/>,
+    revenue:           <RevenuePage/>,
+    stock:             <StockPage/>,
+    crop:              <CropPage/>,
+    weather:           <WeatherPage/>,
   };
 
   return (
     <div style={{ display:"flex", height:"100vh", background:"linear-gradient(160deg,#0A1A0F 0%,#0D1F12 50%,#080F10 100%)", fontFamily:"'DM Sans',sans-serif", overflow:"hidden" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
-      <style>{`
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        .shimmer-bg { background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.03) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite linear; }
-        * { box-sizing: border-box; }
-      `}</style>
-      <Sidebar active={page} onNav={setPage} criticalCount={criticalCount}/>
+      {fonts}
+      <Sidebar active={page} onNav={setPage} criticalCount={criticalCount} user={user} onLogout={onLogout}/>
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <TopBar page={page} dashboard={dashboard}/>
+        <TopBar page={page} dashboard={dashboard} onLogout={onLogout}/>
         <main style={{ flex:1, overflowY:"auto", padding:"28px 32px" }}>
           {pageLoading ? <SkeletonLoader/> : PAGES[page]}
         </main>

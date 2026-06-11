@@ -1,22 +1,27 @@
 import mongoose from "mongoose";
 
-const weatherSchema =
-  new mongoose.Schema(
-    {
-      region: String,
-
-      alertType: String,
-
-      temperature: Number,
-
-      probability: Number,
-
-      description: String
+const weatherAlertSchema = new mongoose.Schema(
+  {
+    description: String,
+    location: String,
+    region: String,
+    temperature: Number,
+    humidity: Number,
+    windSpeed: Number,
+    precipitation_probability: Number,
+    current_weather: { 
+      temperature: Number, 
+      weathercode: Number, 
+      windspeed: Number 
     },
-    { timestamps: true }
-  );
-
-export default mongoose.model(
-  "WeatherAlert",
-  weatherSchema
+    hourly: { 
+      time: [String], 
+      precipitation_probability: [Number] 
+    },
+    suggestion: String,
+    severity: { type: String, enum: ["Low", "Medium", "High"], default: "Medium" },
+  },
+  { timestamps: true }
 );
+
+export default mongoose.models.WeatherAlert || mongoose.model("WeatherAlert", weatherAlertSchema);

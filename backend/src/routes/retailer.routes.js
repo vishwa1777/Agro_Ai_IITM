@@ -1,57 +1,11 @@
-import express from "express";
+import { Router } from "express";
+import { getRetailers, getRetailer, createRetailer, updateRetailer, deleteRetailer } from "../controllers/retailer.controller.js";
+import protect from "../middleware/auth.middleware.js";
 
-import auth from "../middleware/auth.js";
-
-import authorize from "../middleware/authorize.js";
-
-import {
-  getRetailers,
-  getRetailer,
-  createRetailer,
-  updateRetailer,
-  deleteRetailer
-} from "../controllers/retailer.controller.js";
-
-const router =
-  express.Router();
-
-router.get(
-  "/",
-  auth,
-  getRetailers
-);
-
-router.get(
-  "/:id",
-  auth,
-  getRetailer
-);
-
-router.post(
-  "/",
-  auth,
-  authorize(
-    "manager",
-    "admin"
-  ),
-  createRetailer
-);
-
-router.put(
-  "/:id",
-  auth,
-  authorize(
-    "manager",
-    "admin"
-  ),
-  updateRetailer
-);
-
-router.delete(
-  "/:id",
-  auth,
-  authorize("admin"),
-  deleteRetailer
-);
-
+const router = Router();
+router.get("/",       protect, getRetailers);
+router.get("/:id",    protect, getRetailer);
+router.post("/",      protect, createRetailer);
+router.put("/:id",    protect, updateRetailer);
+router.delete("/:id", protect, deleteRetailer);
 export default router;

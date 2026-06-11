@@ -1,18 +1,7 @@
-import express from "express";
+import { Router } from "express";
+import { getRecommendations } from "../controllers/recommendation.controller.js";
+import protect from "../middleware/auth.middleware.js";
 
-import auth from "../middleware/auth.js";
-
-import {
-  getRecommendations
-} from "../controllers/recommendation.controller.js";
-
-const router =
-  express.Router();
-
-router.get(
-  "/",
-  auth,
-  getRecommendations
-);
-
+const router = Router();
+router.get("/", protect, getRecommendations);
 export default router;
